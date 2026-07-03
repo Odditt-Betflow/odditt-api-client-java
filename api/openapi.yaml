@@ -1,0 +1,4547 @@
+openapi: 3.0.3
+info:
+  title: Odditt B2B Public API
+  version: 1.0.0
+servers:
+- url: https://api.odditt.com
+paths:
+  /v1/account/api-keys:
+    get:
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/auth_ListAPIKeysResponse"
+          description: List of API keys
+        "401":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/auth_ErrorResponse"
+          description: Missing or invalid credentials.
+      security:
+      - BearerAuth: []
+      summary: List own API keys
+      tags:
+      - Account
+      x-accepts:
+      - application/json
+    post:
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/auth_CreateAPIKeyRequest"
+        required: true
+      responses:
+        "201":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/auth_CreateAPIKeyResponse"
+          description: API key created (plaintext returned once)
+        "400":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/auth_ErrorResponse"
+          description: The request was malformed (invalid path/query parameter or
+            JSON type mismatch in the body).
+        "401":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/auth_ErrorResponse"
+          description: Missing or invalid credentials.
+        "422":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/auth_ErrorResponse"
+          description: The request body was syntactically valid JSON but one or more
+            fields failed validation; the message names each offending field.
+      security:
+      - BearerAuth: []
+      summary: Create a new API key
+      tags:
+      - Account
+      x-content-type: application/json
+      x-accepts:
+      - application/json
+  /v1/account/api-keys/{key_code}:
+    delete:
+      parameters:
+      - explode: false
+        in: path
+        name: key_code
+        required: true
+        schema:
+          format: uuid
+          type: string
+        style: simple
+      responses:
+        "200":
+          description: API key deactivated
+        "401":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/auth_ErrorResponse"
+          description: Missing or invalid credentials.
+        "409":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/_v1_account_api_keys__key_code__delete_409_response"
+          description: "The request conflicts with the current resource state. Uses\
+            \ the account-envelope shape `{ \"success\": false, \"error\": \"...\"\
+            \ }` rather than the standard error envelope."
+      security:
+      - BearerAuth: []
+      summary: Deactivate an API key
+      tags:
+      - Account
+      x-accepts:
+      - application/json
+  /v1/account/check-endpoint:
+    delete:
+      responses:
+        "200":
+          description: Check endpoint deleted
+        "401":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/auth_ErrorResponse"
+          description: Missing or invalid credentials.
+        "409":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/_v1_account_api_keys__key_code__delete_409_response"
+          description: "The request conflicts with the current resource state. Uses\
+            \ the account-envelope shape `{ \"success\": false, \"error\": \"...\"\
+            \ }` rather than the standard error envelope."
+      security:
+      - BearerAuth: []
+      summary: Delete the check endpoint
+      tags:
+      - Account
+      x-accepts:
+      - application/json
+    get:
+      description: "Returns the URL, method and bearer token preview for the check\
+        \ endpoint used by flow quoting. The full bearer token is never returned."
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/auth_CheckEndpointResponse"
+          description: Check endpoint configuration (or null data if not configured)
+        "401":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/auth_ErrorResponse"
+          description: Missing or invalid credentials.
+      security:
+      - BearerAuth: []
+      summary: Get the configured check endpoint
+      tags:
+      - Account
+      x-accepts:
+      - application/json
+    post:
+      description: "Stores or updates the URL, method and bearer token used to quote\
+        \ flows against the client's own service. A single configuration exists per\
+        \ client."
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/auth_SetCheckEndpointRequest"
+        required: true
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/auth_CheckEndpointResponse"
+          description: Check endpoint stored
+        "400":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/auth_ErrorResponse"
+          description: The request was malformed (invalid path/query parameter or
+            JSON type mismatch in the body).
+        "401":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/auth_ErrorResponse"
+          description: Missing or invalid credentials.
+        "422":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/auth_ErrorResponse"
+          description: The request body was syntactically valid JSON but one or more
+            fields failed validation; the message names each offending field.
+      security:
+      - BearerAuth: []
+      summary: Set the check endpoint (upsert)
+      tags:
+      - Account
+      x-content-type: application/json
+      x-accepts:
+      - application/json
+  /v1/account/config:
+    get:
+      responses:
+        "200":
+          description: Client configuration
+        "401":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/auth_ErrorResponse"
+          description: Missing or invalid credentials.
+      security:
+      - BearerAuth: []
+      summary: Get own client configuration
+      tags:
+      - Account
+      x-accepts:
+      - application/json
+  /v1/account/secret:
+    post:
+      responses:
+        "201":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/auth_CreateSecretResponse"
+          description: Secret created (plaintext returned once)
+        "401":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/auth_ErrorResponse"
+          description: Missing or invalid credentials.
+      security:
+      - BearerAuth: []
+      summary: Create a new client secret
+      tags:
+      - Account
+      x-accepts:
+      - application/json
+  /v1/account/secrets:
+    get:
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/auth_ListSecretsResponse"
+          description: List of secrets
+        "401":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/auth_ErrorResponse"
+          description: Missing or invalid credentials.
+      security:
+      - BearerAuth: []
+      summary: List own client secrets
+      tags:
+      - Account
+      x-accepts:
+      - application/json
+  /v1/account/secrets/{secret_code}:
+    delete:
+      parameters:
+      - explode: false
+        in: path
+        name: secret_code
+        required: true
+        schema:
+          format: uuid
+          type: string
+        style: simple
+      responses:
+        "200":
+          description: Secret deleted
+        "401":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/auth_ErrorResponse"
+          description: Missing or invalid credentials.
+        "409":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/_v1_account_api_keys__key_code__delete_409_response"
+          description: "The request conflicts with the current resource state. Uses\
+            \ the account-envelope shape `{ \"success\": false, \"error\": \"...\"\
+            \ }` rather than the standard error envelope."
+      security:
+      - BearerAuth: []
+      summary: Delete a client secret
+      tags:
+      - Account
+      x-accepts:
+      - application/json
+  /v1/account/usage:
+    get:
+      parameters:
+      - explode: true
+        in: query
+        name: start_date
+        required: false
+        schema:
+          format: date-time
+          type: string
+        style: form
+      - explode: true
+        in: query
+        name: end_date
+        required: false
+        schema:
+          format: date-time
+          type: string
+        style: form
+      responses:
+        "200":
+          description: Usage data
+        "401":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/auth_ErrorResponse"
+          description: Missing or invalid credentials.
+      security:
+      - BearerAuth: []
+      summary: Get own usage stats
+      tags:
+      - Account
+      x-accepts:
+      - application/json
+  /v1/affiliates/deals:
+    post:
+      description: "Paginated client deals (carousel/featured/list), optionally enriched\
+        \ with operator reviews. Scoped to the authenticated client."
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/_v1_affiliates_deals_post_request"
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                type: object
+          description: OK
+        "403":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/affiliate_ErrorResponse"
+          description: Authenticated but not permitted to access this resource.
+        "422":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/affiliate_ErrorResponse"
+          description: One or more fields failed validation; the message names each
+            offending field.
+        "500":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/affiliate_ErrorResponse"
+          description: Unexpected server error.
+      security:
+      - ApiKeyAuth: []
+      - BearerAuth: []
+      summary: Paginated client deals
+      tags:
+      - Offers
+      x-content-type: application/json
+      x-accepts:
+      - application/json
+  /v1/affiliates/event-position:
+    post:
+      description: "Returns live odds across operators for a single event betting\
+        \ market position, overlaid with the calling client's best affiliate offer\
+        \ per operator. Powers the widget's \"Bet Now\" cart for a single selection.\
+        \ Results are scoped to the authenticated client; operators can be gated with\
+        \ operator_ids / operator_keys."
+      requestBody:
+        content:
+          application/json:
+            example:
+              country_code: US
+              event_betting_market_position_id: 351558937
+              operator_ids:
+              - 1
+              - 2
+              subnational_region_code: NJ
+            schema:
+              $ref: "#/components/schemas/_v1_affiliates_event_position_post_request"
+        required: true
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                type: object
+          description: OK
+        "403":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/affiliate_ErrorResponse"
+          description: Authenticated but not permitted to access this resource.
+        "422":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/affiliate_ErrorResponse"
+          description: One or more fields failed validation; the message names each
+            offending field.
+        "500":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/affiliate_ErrorResponse"
+          description: Unexpected server error.
+      security:
+      - ApiKeyAuth: []
+      - BearerAuth: []
+      summary: Single-bet cart for affiliate mode
+      tags:
+      - Affiliates
+      x-content-type: application/json
+      x-accepts:
+      - application/json
+  /v1/affiliates/events:
+    post:
+      description: Fire-and-forget telemetry. Records one impression (card render)
+        or click (deeplink tap). Returns 202 on accept; never blocks the widget's
+        click-out.
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/_v1_affiliates_events_post_request"
+        required: true
+      responses:
+        "202":
+          description: Accepted
+        "403":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/affiliate_ErrorResponse"
+          description: Authenticated but not permitted to access this resource.
+        "422":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/affiliate_ErrorResponse"
+          description: One or more fields failed validation; the message names each
+            offending field.
+      security:
+      - ApiKeyAuth: []
+      - BearerAuth: []
+      summary: Log an impression or click
+      tags:
+      - Telemetry
+      x-content-type: application/json
+      x-accepts:
+      - application/json
+  /v1/affiliates/links:
+    post:
+      description: "Creates a link, or updates the existing one on the natural key\
+        \ (operator + geography + category + campaign + label). Resolves operator,\
+        \ country, and region at write time; unresolvable codes return 422."
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/_v1_affiliates_links_post_request"
+        required: true
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                type: object
+          description: OK
+        "403":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/affiliate_ErrorResponse"
+          description: Authenticated but not permitted to access this resource.
+        "422":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/affiliate_ErrorResponse"
+          description: One or more fields failed validation; the message names each
+            offending field.
+        "500":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/affiliate_ErrorResponse"
+          description: Unexpected server error.
+      security:
+      - ApiKeyAuth: []
+      - BearerAuth: []
+      summary: Create or upsert a single link
+      tags:
+      - Links
+      x-content-type: application/json
+      x-accepts:
+      - application/json
+  /v1/affiliates/links/bulk:
+    patch:
+      description: Applies a patch to all links matching a filter (e.g. rewrite all
+        FanDuel-NJ URLs on a domain change).
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/_v1_affiliates_links_bulk_patch_request"
+        required: true
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                type: object
+          description: OK
+        "403":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/affiliate_ErrorResponse"
+          description: Authenticated but not permitted to access this resource.
+        "422":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/affiliate_ErrorResponse"
+          description: One or more fields failed validation; the message names each
+            offending field.
+        "500":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/affiliate_ErrorResponse"
+          description: Unexpected server error.
+      security:
+      - ApiKeyAuth: []
+      - BearerAuth: []
+      summary: Bulk patch links by filter
+      tags:
+      - Links
+      x-content-type: application/json
+      x-accepts:
+      - application/json
+    post:
+      description: Upserts many links idempotently on the natural key. Accepts a JSON
+        array of row objects or a text/csv body (header row). Per-row errors never
+        fail the batch. Use ?dry_run=true to validate without persisting.
+      parameters:
+      - description: "When true, validates the whole batch and returns the per-row\
+          \ report without persisting. Always synchronous."
+        explode: true
+        in: query
+        name: dry_run
+        required: false
+        schema:
+          type: boolean
+        style: form
+      - description: "Force background processing. Batches of 500+ rows are queued\
+          \ automatically regardless of this flag. Queued batches return 202 with\
+          \ a job_id to poll at /v1/affiliates/links/jobs/{job_id}."
+        explode: true
+        in: query
+        name: async
+        required: false
+        schema:
+          type: boolean
+        style: form
+      requestBody:
+        content:
+          application/json:
+            schema:
+              items:
+                type: object
+              type: array
+          text/csv:
+            schema:
+              type: string
+        required: true
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                type: object
+          description: Processed synchronously
+        "202":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/_v1_affiliates_links_bulk_post_202_response"
+          description: Accepted for background processing.
+        "400":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/affiliate_ErrorResponse"
+          description: The request was malformed.
+        "403":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/affiliate_ErrorResponse"
+          description: Authenticated but not permitted to access this resource.
+        "422":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/affiliate_ErrorResponse"
+          description: One or more fields failed validation; the message names each
+            offending field.
+        "500":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/affiliate_ErrorResponse"
+          description: Unexpected server error.
+      security:
+      - ApiKeyAuth: []
+      - BearerAuth: []
+      summary: Bulk create/upsert links (JSON or CSV)
+      tags:
+      - Links
+      x-content-type: application/json
+      x-accepts:
+      - application/json
+  /v1/affiliates/links/bulk-deactivate:
+    post:
+      description: Soft-deletes all links matching a filter (e.g. a state goes offline).
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/_v1_affiliates_links_bulk_deactivate_post_request"
+        required: true
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                type: object
+          description: OK
+        "403":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/affiliate_ErrorResponse"
+          description: Authenticated but not permitted to access this resource.
+        "422":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/affiliate_ErrorResponse"
+          description: One or more fields failed validation; the message names each
+            offending field.
+        "500":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/affiliate_ErrorResponse"
+          description: Unexpected server error.
+      security:
+      - ApiKeyAuth: []
+      - BearerAuth: []
+      summary: Bulk deactivate links by filter
+      tags:
+      - Links
+      x-content-type: application/json
+      x-accepts:
+      - application/json
+  /v1/affiliates/links/clicks:
+    get:
+      description: "Per-link, per-day impression and click counts for the authenticated\
+        \ client."
+      parameters:
+      - explode: true
+        in: query
+        name: start_date
+        required: true
+        schema:
+          format: date
+          type: string
+        style: form
+      - explode: true
+        in: query
+        name: end_date
+        required: true
+        schema:
+          format: date
+          type: string
+        style: form
+      - explode: true
+        in: query
+        name: operator_id
+        required: false
+        schema:
+          format: int64
+          type: integer
+        style: form
+      - explode: true
+        in: query
+        name: country_code
+        required: false
+        schema:
+          maxLength: 2
+          minLength: 2
+          type: string
+        style: form
+      - explode: true
+        in: query
+        name: subnational_region_code
+        required: false
+        schema:
+          maxLength: 10
+          type: string
+        style: form
+      - explode: true
+        in: query
+        name: offer_campaign
+        required: false
+        schema:
+          type: string
+        style: form
+      - explode: true
+        in: query
+        name: offer_label
+        required: false
+        schema:
+          type: string
+        style: form
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                type: object
+          description: OK
+        "403":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/affiliate_ErrorResponse"
+          description: Authenticated but not permitted to access this resource.
+        "422":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/affiliate_ErrorResponse"
+          description: One or more fields failed validation; the message names each
+            offending field.
+        "500":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/affiliate_ErrorResponse"
+          description: Unexpected server error.
+      security:
+      - ApiKeyAuth: []
+      - BearerAuth: []
+      summary: Impression/click rollups
+      tags:
+      - Reporting
+      x-accepts:
+      - application/json
+  /v1/affiliates/links/inventory-summary:
+    get:
+      description: Active/inactive link counts grouped by the requested dimension.
+      parameters:
+      - explode: true
+        in: query
+        name: group_by
+        required: false
+        schema:
+          default: operator
+          enum:
+          - operator
+          - subnational_region
+          - offer_campaign
+          - offer_label
+          - operator_subnational_region
+          - operator_offer_campaign
+          type: string
+        style: form
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                type: object
+          description: OK
+        "403":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/affiliate_ErrorResponse"
+          description: Authenticated but not permitted to access this resource.
+        "422":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/affiliate_ErrorResponse"
+          description: One or more fields failed validation; the message names each
+            offending field.
+        "500":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/affiliate_ErrorResponse"
+          description: Unexpected server error.
+      security:
+      - ApiKeyAuth: []
+      - BearerAuth: []
+      summary: Inventory counts
+      tags:
+      - Reporting
+      x-accepts:
+      - application/json
+  /v1/affiliates/links/jobs:
+    get:
+      description: Recent async bulk jobs for the authenticated client.
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                type: object
+          description: OK
+        "403":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/affiliate_ErrorResponse"
+          description: Authenticated but not permitted to access this resource.
+        "500":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/affiliate_ErrorResponse"
+          description: Unexpected server error.
+      security:
+      - ApiKeyAuth: []
+      - BearerAuth: []
+      summary: List async bulk jobs
+      tags:
+      - Links
+      x-accepts:
+      - application/json
+  /v1/affiliates/links/jobs/{job_id}:
+    get:
+      description: "Status, counts, and per-row errors for one async bulk job. Poll\
+        \ until status is \"completed\" or \"failed\". Scoped to the authenticated\
+        \ client."
+      parameters:
+      - explode: false
+        in: path
+        name: job_id
+        required: true
+        schema:
+          format: uuid
+          type: string
+        style: simple
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                type: object
+          description: OK
+        "400":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/affiliate_ErrorResponse"
+          description: The request was malformed.
+        "403":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/affiliate_ErrorResponse"
+          description: Authenticated but not permitted to access this resource.
+        "404":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/affiliate_ErrorResponse"
+          description: The requested resource does not exist.
+        "500":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/affiliate_ErrorResponse"
+          description: Unexpected server error.
+      security:
+      - ApiKeyAuth: []
+      - BearerAuth: []
+      summary: Poll an async bulk job
+      tags:
+      - Links
+      x-accepts:
+      - application/json
+  /v1/affiliates/lookups/affiliate-networks:
+    get:
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                type: object
+          description: OK
+        "500":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/affiliate_ErrorResponse"
+          description: Unexpected server error.
+      security:
+      - ApiKeyAuth: []
+      - BearerAuth: []
+      summary: Affiliate networks
+      tags:
+      - Lookups
+      x-accepts:
+      - application/json
+  /v1/affiliates/lookups/offer-categories:
+    get:
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                type: object
+          description: OK
+        "500":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/affiliate_ErrorResponse"
+          description: Unexpected server error.
+      security:
+      - ApiKeyAuth: []
+      - BearerAuth: []
+      summary: Offer categories
+      tags:
+      - Lookups
+      x-accepts:
+      - application/json
+  /v1/affiliates/lookups/operator-jurisdictions:
+    get:
+      description: Where we believe an operator is live. Informational only — not
+        an upload gate.
+      parameters:
+      - explode: true
+        in: query
+        name: operator_id
+        required: false
+        schema:
+          format: int64
+          type: integer
+        style: form
+      - explode: true
+        in: query
+        name: country_code
+        required: false
+        schema:
+          maxLength: 2
+          minLength: 2
+          type: string
+        style: form
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                type: object
+          description: OK
+        "500":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/affiliate_ErrorResponse"
+          description: Unexpected server error.
+      security:
+      - ApiKeyAuth: []
+      - BearerAuth: []
+      summary: Operator jurisdictions
+      tags:
+      - Lookups
+      x-accepts:
+      - application/json
+  /v1/affiliates/lookups/operators:
+    get:
+      description: "Paginated list of operators, optionally filtered by a free-text\
+        \ search term."
+      parameters:
+      - explode: true
+        in: query
+        name: search
+        required: false
+        schema:
+          maxLength: 255
+          type: string
+        style: form
+      - explode: true
+        in: query
+        name: page
+        required: false
+        schema:
+          default: 1
+          minimum: 1
+          type: integer
+        style: form
+      - explode: true
+        in: query
+        name: page_size
+        required: false
+        schema:
+          default: 20
+          maximum: 100
+          minimum: 1
+          type: integer
+        style: form
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                type: object
+          description: OK
+        "500":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/affiliate_ErrorResponse"
+          description: Unexpected server error.
+      security:
+      - ApiKeyAuth: []
+      - BearerAuth: []
+      summary: Operators
+      tags:
+      - Lookups
+      x-accepts:
+      - application/json
+  /v1/affiliates/offers:
+    post:
+      description: Returns the calling client's best operator offer card per operator
+        for a geography. The core offers read the widget cart renders.
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/_v1_affiliates_offers_post_request"
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                type: object
+          description: OK
+        "403":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/affiliate_ErrorResponse"
+          description: Authenticated but not permitted to access this resource.
+        "422":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/affiliate_ErrorResponse"
+          description: One or more fields failed validation; the message names each
+            offending field.
+        "500":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/affiliate_ErrorResponse"
+          description: Unexpected server error.
+      security:
+      - ApiKeyAuth: []
+      - BearerAuth: []
+      summary: Client offer cards for a geography
+      tags:
+      - Offers
+      x-content-type: application/json
+      x-accepts:
+      - application/json
+  /v1/affiliates/parlay:
+    post:
+      description: "Returns combined parlay odds per operator, the per-leg single\
+        \ bets, and the calling client's best affiliate offer per operator, with combo\
+        \ deeplinks generated per operator. Powers the widget's \"Bet Now\" cart for\
+        \ a multi-leg bet. Results are scoped to the authenticated client; operators\
+        \ can be gated with operator_ids / operator_keys."
+      requestBody:
+        content:
+          application/json:
+            example:
+              country_code: US
+              event_betting_market_position_ids:
+              - 351558937
+              - 351558940
+              operator_ids:
+              - 1
+              - 2
+              subnational_region_code: NJ
+            schema:
+              $ref: "#/components/schemas/_v1_affiliates_parlay_post_request"
+        required: true
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                type: object
+          description: OK
+        "403":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/affiliate_ErrorResponse"
+          description: Authenticated but not permitted to access this resource.
+        "422":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/affiliate_ErrorResponse"
+          description: One or more fields failed validation; the message names each
+            offending field.
+        "500":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/affiliate_ErrorResponse"
+          description: Unexpected server error.
+      security:
+      - ApiKeyAuth: []
+      - BearerAuth: []
+      summary: Parlay cart for affiliate mode
+      tags:
+      - Affiliates
+      x-content-type: application/json
+      x-accepts:
+      - application/json
+  /v1/auth/login:
+    post:
+      parameters:
+      - explode: false
+        in: header
+        name: X-API-Key
+        required: true
+        schema:
+          type: string
+        style: simple
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/auth_TokenPair"
+          description: Token pair
+      summary: Login with API key
+      tags:
+      - Authentication
+      x-accepts:
+      - application/json
+  /v1/auth/refresh:
+    post:
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/auth_RefreshRequest"
+        required: true
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/auth_TokenPair"
+          description: Token pair
+        "400":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/auth_ErrorResponse"
+          description: The request was malformed (invalid path/query parameter or
+            JSON type mismatch in the body).
+        "422":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/auth_ErrorResponse"
+          description: The request body was syntactically valid JSON but one or more
+            fields failed validation; the message names each offending field.
+      summary: Refresh tokens
+      tags:
+      - Authentication
+      x-content-type: application/json
+      x-accepts:
+      - application/json
+  /v1/events/upcoming-events:
+    post:
+      description: "Returns upcoming events with optional sport and league filters,\
+        \ timezone support, and pagination."
+      requestBody:
+        content:
+          application/json:
+            example:
+              event_date: 2026-04-09
+              league_id: null
+              page: 1
+              page_size: 20
+              sport_id: 2
+              timezone: UTC
+            schema:
+              $ref: "#/components/schemas/_v1_events_upcoming_events_post_request"
+        required: true
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                type: object
+          description: OK
+      security:
+      - ApiKeyAuth: []
+      - BearerAuth: []
+      summary: Get upcoming events
+      tags:
+      - Events
+      x-content-type: application/json
+      x-accepts:
+      - application/json
+  /v1/historical/events:
+    get:
+      description: |
+        Returns a paginated catalog of per-event historical odds files the authenticated client has access to. Each result entry carries pre-baked download URLs for the JSON and CSV payloads; clients GET those URLs directly. Results are scoped to the authenticated client; callers without a client association receive `403 Forbidden`.
+      parameters:
+      - description: Payload schema version. Defaults to `v1` when omitted. Unknown
+          versions are rejected.
+        explode: true
+        in: query
+        name: schema_version
+        required: false
+        schema:
+          default: v1
+          type: string
+        style: form
+      - explode: true
+        in: query
+        name: sport_id
+        required: false
+        schema:
+          format: int64
+          minimum: 1
+          type: integer
+        style: form
+      - explode: true
+        in: query
+        name: league_id
+        required: false
+        schema:
+          format: int64
+          minimum: 1
+          type: integer
+        style: form
+      - description: Filter to events involving this team as either home or away.
+        explode: true
+        in: query
+        name: team_id
+        required: false
+        schema:
+          format: int64
+          minimum: 1
+          type: integer
+        style: form
+      - description: "Inclusive lower bound on the event/affiliation date, ISO format\
+          \ YYYY-MM-DD."
+        explode: true
+        in: query
+        name: start_date
+        required: false
+        schema:
+          type: string
+        style: form
+      - description: "Inclusive upper bound on the event/affiliation date, ISO format\
+          \ YYYY-MM-DD."
+        explode: true
+        in: query
+        name: end_date
+        required: false
+        schema:
+          type: string
+        style: form
+      - explode: true
+        in: query
+        name: page
+        required: false
+        schema:
+          default: 1
+          format: int64
+          minimum: 1
+          type: integer
+        style: form
+      - explode: true
+        in: query
+        name: page_size
+        required: false
+        schema:
+          default: 20
+          format: int64
+          maximum: 100
+          minimum: 1
+          type: integer
+        style: form
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                type: object
+          description: OK
+        "401":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/trends_ErrorResponse"
+          description: Missing or invalid credentials.
+        "403":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/trends_ErrorResponse"
+          description: Authenticated but not permitted to access this resource.
+        "422":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/trends_ErrorResponse"
+          description: The request body was syntactically valid JSON but one or more
+            fields failed validation; the message names each offending field.
+        "500":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/trends_ErrorResponse"
+          description: Unexpected server error.
+      security:
+      - ApiKeyAuth: []
+      - BearerAuth: []
+      summary: List historical odds events (paginated)
+      tags:
+      - Historical
+      x-accepts:
+      - application/json
+  /v1/historical/odds/{event_id}.{ext}:
+    get:
+      description: |
+        Resolves the requested per-event file for the authenticated client and streams the JSON or CSV payload back. The response body is the raw file content (not the manifest envelope); the API takes care of fetching the bytes from the underlying CDN so callers see a single HTTP call per file.
+
+        The `sha256` of the bytes-at-rest is exposed as a strong `ETag`. Clients can short-circuit with `If-None-Match` to receive `304 Not Modified`. `Range` requests are forwarded upstream and `206 Partial Content` responses are relayed unchanged — useful for resuming multi-MB CSV downloads.
+      parameters:
+      - description: Canonical event identifier.
+        explode: false
+        in: path
+        name: event_id
+        required: true
+        schema:
+          format: int64
+          minimum: 1
+          type: integer
+        style: simple
+      - description: File format. `json` returns `application/json`; `csv` returns
+          `text/csv`.
+        explode: false
+        in: path
+        name: ext
+        required: true
+        schema:
+          enum:
+          - json
+          - csv
+          type: string
+        style: simple
+      - description: Payload schema version. Defaults to `v1` when omitted.
+        explode: true
+        in: query
+        name: schema_version
+        required: false
+        schema:
+          default: v1
+          type: string
+        style: form
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                type: object
+            text/csv:
+              schema:
+                format: binary
+                type: string
+          description: File payload streamed back to the client.
+          headers:
+            Content-Disposition:
+              description: Always `attachment; filename="event_<event_id>.<ext>"`.
+              explode: false
+              schema:
+                type: string
+              style: simple
+            ETag:
+              description: Strong validator based on the SHA-256 of the file bytes-at-rest.
+              explode: false
+              schema:
+                type: string
+              style: simple
+        "206":
+          description: Partial content when the client provided a `Range` header.
+        "304":
+          description: Not modified — the client supplied a matching `If-None-Match`.
+        "400":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/trends_ErrorResponse"
+          description: The request was malformed (invalid path/query parameter or
+            JSON type mismatch in the body).
+        "401":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/trends_ErrorResponse"
+          description: Missing or invalid credentials.
+        "403":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/trends_ErrorResponse"
+          description: Authenticated but not permitted to access this resource.
+        "404":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/trends_ErrorResponse"
+          description: The requested resource does not exist.
+        "422":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/trends_ErrorResponse"
+          description: The request body was syntactically valid JSON but one or more
+            fields failed validation; the message names each offending field.
+        "500":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/trends_ErrorResponse"
+          description: Unexpected server error.
+        "502":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/trends_ErrorResponse"
+          description: Upstream content delivery unavailable.
+      security:
+      - ApiKeyAuth: []
+      - BearerAuth: []
+      summary: Download a per-event historical odds file
+      tags:
+      - Historical
+      x-accepts:
+      - application/json
+      - text/csv
+  /v1/oauth/login:
+    post:
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/auth_OAuthLoginRequest"
+        required: true
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/auth_TokenPair"
+          description: Token pair
+        "400":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/auth_ErrorResponse"
+          description: The request was malformed (invalid path/query parameter or
+            JSON type mismatch in the body).
+        "401":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/auth_ErrorResponse"
+          description: Missing or invalid credentials.
+        "422":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/auth_ErrorResponse"
+          description: The request body was syntactically valid JSON but one or more
+            fields failed validation; the message names each offending field.
+      summary: OAuth login (client credentials)
+      tags:
+      - Authentication
+      x-content-type: application/json
+      x-accepts:
+      - application/json
+  /v1/oauth/refresh:
+    post:
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/auth_RefreshRequest"
+        required: true
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/auth_TokenPair"
+          description: Token pair
+        "400":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/auth_ErrorResponse"
+          description: The request was malformed (invalid path/query parameter or
+            JSON type mismatch in the body).
+        "422":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/auth_ErrorResponse"
+          description: The request body was syntactically valid JSON but one or more
+            fields failed validation; the message names each offending field.
+      summary: OAuth refresh
+      tags:
+      - Authentication
+      x-content-type: application/json
+      x-accepts:
+      - application/json
+  /v1/odds/upcoming-odds-by-event:
+    post:
+      description: "Returns paginated betting market positions for a specific upcoming\
+        \ event, optionally filtered by operator."
+      requestBody:
+        content:
+          application/json:
+            example:
+              event_id: 123456
+              operator_ids:
+              - 1
+              - 2
+              - 3
+              page: 1
+              page_size: 20
+            schema:
+              $ref: "#/components/schemas/_v1_odds_upcoming_odds_by_event_post_request"
+        required: true
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                type: object
+          description: OK
+      security:
+      - ApiKeyAuth: []
+      - BearerAuth: []
+      summary: Get upcoming odds by event
+      tags:
+      - Odds
+      x-content-type: application/json
+      x-accepts:
+      - application/json
+  /v1/references/betting-market-categories:
+    get:
+      description: "Returns available betting market categories, optionally filtered\
+        \ by sport."
+      parameters:
+      - explode: true
+        in: query
+        name: sport_id
+        required: false
+        schema:
+          format: int64
+          minimum: 1
+          type: integer
+        style: form
+      - description: "Sport external key (e.g. 'american-football'). Alternative to\
+          \ sport_id. If both are provided, sport_id takes precedence."
+        explode: true
+        in: query
+        name: sport_key
+        required: false
+        schema:
+          type: string
+        style: form
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                type: object
+          description: OK
+      security:
+      - ApiKeyAuth: []
+      - BearerAuth: []
+      summary: Get betting market categories
+      tags:
+      - References
+      x-accepts:
+      - application/json
+  /v1/references/betting-market-positions:
+    get:
+      description: Returns all available betting market positions.
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                type: object
+          description: OK
+      security:
+      - ApiKeyAuth: []
+      - BearerAuth: []
+      summary: Get all betting market positions
+      tags:
+      - References
+      x-accepts:
+      - application/json
+  /v1/references/betting-markets:
+    get:
+      description: Returns a paginated list of betting markets with optional sport
+        filter and text search.
+      parameters:
+      - explode: true
+        in: query
+        name: sport_id
+        required: false
+        schema:
+          format: int64
+          minimum: 1
+          type: integer
+        style: form
+      - description: "Sport external key (e.g. 'american-football'). Alternative to\
+          \ sport_id. If both are provided, sport_id takes precedence."
+        explode: true
+        in: query
+        name: sport_key
+        required: false
+        schema:
+          type: string
+        style: form
+      - description: Text search filter for betting market names
+        explode: true
+        in: query
+        name: search
+        required: false
+        schema:
+          type: string
+        style: form
+      - description: Page number for pagination
+        explode: true
+        in: query
+        name: page
+        required: false
+        schema:
+          default: 1
+          format: int64
+          minimum: 1
+          type: integer
+        style: form
+      - description: Number of results per page
+        explode: true
+        in: query
+        name: page_size
+        required: false
+        schema:
+          default: 100
+          format: int64
+          maximum: 100
+          minimum: 1
+          type: integer
+        style: form
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                type: object
+          description: OK
+      security:
+      - ApiKeyAuth: []
+      - BearerAuth: []
+      summary: Get betting markets (paginated)
+      tags:
+      - References
+      x-accepts:
+      - application/json
+  /v1/references/countries:
+    get:
+      parameters:
+      - description: Search by country name
+        explode: true
+        in: query
+        name: search
+        required: false
+        schema:
+          type: string
+        style: form
+      - explode: true
+        in: query
+        name: page
+        required: false
+        schema:
+          default: 1
+          format: int64
+          minimum: 1
+          type: integer
+        style: form
+      - explode: true
+        in: query
+        name: page_size
+        required: false
+        schema:
+          default: 20
+          format: int64
+          maximum: 100
+          minimum: 1
+          type: integer
+        style: form
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/trends_PaginatedResponse"
+          description: OK
+      security:
+      - ApiKeyAuth: []
+      - BearerAuth: []
+      summary: Get countries (paginated)
+      tags:
+      - References
+      x-accepts:
+      - application/json
+  /v1/references/event-periods:
+    get:
+      description: "Returns available event periods, optionally filtered by sport."
+      parameters:
+      - explode: true
+        in: query
+        name: sport_id
+        required: false
+        schema:
+          format: int64
+          minimum: 1
+          type: integer
+        style: form
+      - description: "Sport external key (e.g. 'american-football'). Alternative to\
+          \ sport_id. If both are provided, sport_id takes precedence."
+        explode: true
+        in: query
+        name: sport_key
+        required: false
+        schema:
+          type: string
+        style: form
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                type: object
+          description: OK
+      security:
+      - ApiKeyAuth: []
+      - BearerAuth: []
+      summary: Get event periods
+      tags:
+      - References
+      x-accepts:
+      - application/json
+  /v1/references/leagues:
+    get:
+      parameters:
+      - explode: true
+        in: query
+        name: country_id
+        required: false
+        schema:
+          format: int64
+          type: integer
+        style: form
+      - explode: true
+        in: query
+        name: sport_id
+        required: false
+        schema:
+          format: int64
+          minimum: 1
+          type: integer
+        style: form
+      - description: "Sport external key (e.g. 'american-football'). Format: {sport_key}.\
+          \ Alternative to sport_id. If both are provided, sport_id takes precedence."
+        explode: true
+        in: query
+        name: sport_key
+        required: false
+        schema:
+          type: string
+        style: form
+      - explode: true
+        in: query
+        name: search
+        required: false
+        schema:
+          type: string
+        style: form
+      - explode: true
+        in: query
+        name: is_popular
+        required: false
+        schema:
+          type: boolean
+        style: form
+      - explode: true
+        in: query
+        name: page
+        required: false
+        schema:
+          default: 1
+          format: int64
+          minimum: 1
+          type: integer
+        style: form
+      - explode: true
+        in: query
+        name: page_size
+        required: false
+        schema:
+          default: 20
+          format: int64
+          maximum: 100
+          minimum: 1
+          type: integer
+        style: form
+      - description: "Search mode (e.g. exact match vs partial). When omitted, uses\
+          \ default search behavior."
+        explode: true
+        in: query
+        name: search_mode
+        required: false
+        schema:
+          type: string
+        style: form
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                type: object
+          description: OK
+      security:
+      - ApiKeyAuth: []
+      - BearerAuth: []
+      summary: Get leagues (paginated)
+      tags:
+      - References
+      x-accepts:
+      - application/json
+  /v1/references/odds-format:
+    get:
+      parameters:
+      - explode: true
+        in: query
+        name: search
+        required: false
+        schema:
+          type: string
+        style: form
+      - explode: true
+        in: query
+        name: page
+        required: false
+        schema:
+          default: 1
+          format: int64
+          minimum: 1
+          type: integer
+        style: form
+      - explode: true
+        in: query
+        name: page_size
+        required: false
+        schema:
+          default: 20
+          format: int64
+          maximum: 100
+          minimum: 1
+          type: integer
+        style: form
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/trends_PaginatedResponse"
+          description: OK
+      security:
+      - ApiKeyAuth: []
+      - BearerAuth: []
+      summary: Get odds formats (paginated)
+      tags:
+      - References
+      x-accepts:
+      - application/json
+  /v1/references/operators:
+    get:
+      parameters:
+      - description: Search by operator display name
+        explode: true
+        in: query
+        name: search
+        required: false
+        schema:
+          type: string
+        style: form
+      - explode: true
+        in: query
+        name: page
+        required: false
+        schema:
+          default: 1
+          format: int64
+          minimum: 1
+          type: integer
+        style: form
+      - explode: true
+        in: query
+        name: page_size
+        required: false
+        schema:
+          default: 20
+          format: int64
+          maximum: 100
+          minimum: 1
+          type: integer
+        style: form
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/trends_PaginatedResponse"
+          description: OK
+      security:
+      - ApiKeyAuth: []
+      - BearerAuth: []
+      summary: Get operators (paginated)
+      tags:
+      - References
+      x-accepts:
+      - application/json
+  /v1/references/players:
+    get:
+      parameters:
+      - explode: true
+        in: query
+        name: team_id
+        required: false
+        schema:
+          format: int64
+          minimum: 1
+          type: integer
+        style: form
+      - description: "Team external key (e.g. 'new-england-patriots', 'nfl.new-england-patriots').\
+          \ Format: {team_key} or {league_key}.{team_key}. Alternative to team_id.\
+          \ If both are provided, team_id takes precedence."
+        explode: true
+        in: query
+        name: team_key
+        required: false
+        schema:
+          type: string
+        style: form
+      - explode: true
+        in: query
+        name: search
+        required: false
+        schema:
+          type: string
+        style: form
+      - explode: true
+        in: query
+        name: page
+        required: false
+        schema:
+          default: 1
+          format: int64
+          minimum: 1
+          type: integer
+        style: form
+      - explode: true
+        in: query
+        name: page_size
+        required: false
+        schema:
+          default: 20
+          format: int64
+          maximum: 100
+          minimum: 1
+          type: integer
+        style: form
+      - description: "Search mode (e.g. exact match vs partial). When omitted, uses\
+          \ default search behavior."
+        explode: true
+        in: query
+        name: search_mode
+        required: false
+        schema:
+          type: string
+        style: form
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                type: object
+          description: OK
+      security:
+      - ApiKeyAuth: []
+      - BearerAuth: []
+      summary: Get players (paginated)
+      tags:
+      - References
+      x-accepts:
+      - application/json
+  /v1/references/sports:
+    get:
+      parameters:
+      - explode: true
+        in: query
+        name: search
+        required: false
+        schema:
+          type: string
+        style: form
+      - explode: true
+        in: query
+        name: page
+        required: false
+        schema:
+          default: 1
+          format: int64
+          minimum: 1
+          type: integer
+        style: form
+      - explode: true
+        in: query
+        name: page_size
+        required: false
+        schema:
+          default: 20
+          format: int64
+          maximum: 100
+          minimum: 1
+          type: integer
+        style: form
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/trends_PaginatedResponse"
+          description: OK
+      security:
+      - ApiKeyAuth: []
+      - BearerAuth: []
+      summary: Get sports (paginated)
+      tags:
+      - References
+      x-accepts:
+      - application/json
+  /v1/references/subnational-regions:
+    get:
+      parameters:
+      - description: Country ID to filter subnational regions
+        explode: true
+        in: query
+        name: country_id
+        required: true
+        schema:
+          format: int64
+          type: integer
+        style: form
+      - description: Search by subnational region name
+        explode: true
+        in: query
+        name: search
+        required: false
+        schema:
+          type: string
+        style: form
+      - explode: true
+        in: query
+        name: page
+        required: false
+        schema:
+          default: 1
+          format: int64
+          minimum: 1
+          type: integer
+        style: form
+      - explode: true
+        in: query
+        name: page_size
+        required: false
+        schema:
+          default: 20
+          format: int64
+          maximum: 100
+          minimum: 1
+          type: integer
+        style: form
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/trends_PaginatedResponse"
+          description: OK
+      security:
+      - ApiKeyAuth: []
+      - BearerAuth: []
+      summary: Get subnational regions (paginated)
+      tags:
+      - References
+      x-accepts:
+      - application/json
+  /v1/references/tag-dimensions:
+    get:
+      description: Returns the top-level tag dimension categories. Use these as entry
+        points to explore the tag hierarchy. Optionally filter to dimensions relevant
+        to a specific flow type.
+      parameters:
+      - description: Filter by flow type eligibility.
+        explode: true
+        in: query
+        name: flow_type
+        required: false
+        schema:
+          enum:
+          - fact_flows
+          - fun_flows
+          - plain_flows
+          - parlays
+          - singles
+          type: string
+        style: form
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/_v1_references_tag_dimensions_get_200_response"
+          description: OK
+      security:
+      - ApiKeyAuth: []
+      - BearerAuth: []
+      summary: Get tag dimensions
+      tags:
+      - References
+      x-accepts:
+      - application/json
+  /v1/references/tag-types/search:
+    get:
+      description: Search across tag types by keyword. Returns paginated results with
+        breadcrumb paths for disambiguation. Use terminal_only combined with flow_type
+        to find only tags that are usable as filters for a specific flow type.
+      parameters:
+      - explode: true
+        in: query
+        name: search
+        required: false
+        schema:
+          type: string
+        style: form
+      - description: How the search term is matched. Defaults to 'starts_with'.
+        explode: true
+        in: query
+        name: search_mode
+        required: false
+        schema:
+          enum:
+          - starts_with
+          - ends_with
+          - contains
+          type: string
+        style: form
+      - description: "Limit results to a specific dimension (e.g. 'event', 'metadata')."
+        explode: true
+        in: query
+        name: dimension
+        required: false
+        schema:
+          type: string
+        style: form
+      - description: Filter by flow type eligibility.
+        explode: true
+        in: query
+        name: flow_type
+        required: false
+        schema:
+          enum:
+          - fact_flows
+          - fun_flows
+          - plain_flows
+          - parlays
+          - singles
+          type: string
+        style: form
+      - description: "When true, returns only terminal (filterable) tag types."
+        explode: true
+        in: query
+        name: terminal_only
+        required: false
+        schema:
+          default: false
+          type: boolean
+        style: form
+      - description: Restrict results to a specific hierarchy depth.
+        explode: true
+        in: query
+        name: tag_level
+        required: false
+        schema:
+          format: int64
+          minimum: 1
+          type: integer
+        style: form
+      - explode: true
+        in: query
+        name: page
+        required: false
+        schema:
+          default: 1
+          format: int64
+          minimum: 1
+          type: integer
+        style: form
+      - explode: true
+        in: query
+        name: page_size
+        required: false
+        schema:
+          default: 20
+          format: int64
+          maximum: 100
+          minimum: 1
+          type: integer
+        style: form
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/trends_PaginatedResponse"
+          description: OK
+      security:
+      - ApiKeyAuth: []
+      - BearerAuth: []
+      summary: Search tag types
+      tags:
+      - References
+      x-accepts:
+      - application/json
+  /v1/references/tag-types/{tag_type_id}/children:
+    get:
+      description: "Returns the direct children of a given tag type, along with context\
+        \ about the parent (description and known values). Use this to navigate the\
+        \ tag hierarchy from dimensions down to individual filterable tags."
+      parameters:
+      - description: Parent tag type ID to drill into.
+        explode: false
+        in: path
+        name: tag_type_id
+        required: true
+        schema:
+          format: int64
+          minimum: 1
+          type: integer
+        style: simple
+      - description: "When true, includes individual value-level leaf tags in the\
+          \ results. When false (default), value-level leaves are omitted — the parent's\
+          \ known_values field already enumerates them."
+        explode: true
+        in: query
+        name: include_values
+        required: false
+        schema:
+          default: false
+          type: boolean
+        style: form
+      - description: Filter by flow type eligibility.
+        explode: true
+        in: query
+        name: flow_type
+        required: false
+        schema:
+          enum:
+          - fact_flows
+          - fun_flows
+          - plain_flows
+          - parlays
+          - singles
+          type: string
+        style: form
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/_v1_references_tag_types__tag_type_id__children_get_200_response"
+          description: OK
+      security:
+      - ApiKeyAuth: []
+      - BearerAuth: []
+      summary: Get child tag types
+      tags:
+      - References
+      x-accepts:
+      - application/json
+  /v1/references/teams:
+    get:
+      description: |
+        Returns a paginated list of teams. When neither `start_date` nor `end_date` is provided, only teams whose affiliation is currently active are returned. When either date is provided, the result is filtered to teams whose affiliation overlapped the requested window — useful for looking up teams that played in a league during a past season.
+      parameters:
+      - explode: true
+        in: query
+        name: league_id
+        required: false
+        schema:
+          format: int64
+          minimum: 1
+          type: integer
+        style: form
+      - description: "League external key (e.g. 'nba', 'united-states.nba'). Format:\
+          \ {league_key} or {country_key}.{league_key}. Alternative to league_id.\
+          \ If both are provided, league_id takes precedence."
+        explode: true
+        in: query
+        name: league_key
+        required: false
+        schema:
+          type: string
+        style: form
+      - explode: true
+        in: query
+        name: search
+        required: false
+        schema:
+          type: string
+        style: form
+      - explode: true
+        in: query
+        name: page
+        required: false
+        schema:
+          default: 1
+          format: int64
+          minimum: 1
+          type: integer
+        style: form
+      - explode: true
+        in: query
+        name: page_size
+        required: false
+        schema:
+          default: 20
+          format: int64
+          maximum: 100
+          minimum: 1
+          type: integer
+        style: form
+      - description: "Search mode (e.g. exact match vs partial). When omitted, uses\
+          \ default search behavior."
+        explode: true
+        in: query
+        name: search_mode
+        required: false
+        schema:
+          type: string
+        style: form
+      - description: "Inclusive lower bound on the event/affiliation date, ISO format\
+          \ YYYY-MM-DD."
+        explode: true
+        in: query
+        name: start_date
+        required: false
+        schema:
+          type: string
+        style: form
+      - description: "Inclusive upper bound on the event/affiliation date, ISO format\
+          \ YYYY-MM-DD."
+        explode: true
+        in: query
+        name: end_date
+        required: false
+        schema:
+          type: string
+        style: form
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                type: object
+          description: OK
+      security:
+      - ApiKeyAuth: []
+      - BearerAuth: []
+      summary: Get teams (paginated)
+      tags:
+      - References
+      x-accepts:
+      - application/json
+  /v1/trends/by-betting-market-position:
+    post:
+      requestBody:
+        content:
+          application/json:
+            example:
+              event_betting_market_position_ids:
+              - 1
+              - 2
+              - 3
+            schema:
+              $ref: "#/components/schemas/_v1_trends_by_betting_market_position_post_request"
+        required: true
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                type: object
+          description: OK. Each record carries `flow_type=fact_flow` and `fact_flow_type=multi`.
+      security:
+      - ApiKeyAuth: []
+      - BearerAuth: []
+      summary: Get flows by betting market position IDs
+      tags:
+      - Trends
+      x-content-type: application/json
+      x-accepts:
+      - application/json
+  /v1/trends/flow-graph-data/{fact_flow_id}:
+    get:
+      parameters:
+      - description: The fact flow ID to get graph data for
+        explode: false
+        in: path
+        name: fact_flow_id
+        required: true
+        schema:
+          format: int64
+          minimum: 1
+          type: integer
+        style: simple
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                type: object
+          description: OK
+      security:
+      - ApiKeyAuth: []
+      - BearerAuth: []
+      summary: Get fact flow graph data
+      tags:
+      - Trends
+      x-accepts:
+      - application/json
+  /v1/trends/flow-tooltip/{flow_type}/{flow_id}:
+    get:
+      parameters:
+      - description: Type of flow (fact or fun)
+        explode: false
+        in: path
+        name: flow_type
+        required: true
+        schema:
+          enum:
+          - fact
+          - fun
+          type: string
+        style: simple
+      - description: The flow ID to get tooltip data for
+        explode: false
+        in: path
+        name: flow_id
+        required: true
+        schema:
+          format: int64
+          minimum: 1
+          type: integer
+        style: simple
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                type: object
+          description: OK
+      security:
+      - ApiKeyAuth: []
+      - BearerAuth: []
+      summary: Get flow tooltip payload
+      tags:
+      - Trends
+      x-accepts:
+      - application/json
+  /v1/trends/flows:
+    post:
+      description: Same parameters as mixed-flows but returns non-mixed (single-type)
+        flows. Uses the same underlying request model.
+      requestBody:
+        content:
+          application/json:
+            example:
+              bet_type: singles
+              fact_flow_type: base
+              flow_type: fact
+              league_id: 7
+              page: 1
+              page_size: 20
+              sport_id: 1
+              starting_soon: true
+            schema:
+              $ref: "#/components/schemas/_v1_trends_flows_post_request"
+        required: true
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                type: object
+          description: "OK. Every record carries a `flow_type` string with one of:\
+            \ `fact_flow`, `fun_flow`, `fact_flow_parlay`, `fun_flow_parlay`, `plain_flow_parlay`.\
+            \ Parlay records also include the same field on each entry of their nested\
+            \ `flows` array. Records with `flow_type=fact_flow` additionally carry\
+            \ a `fact_flow_type` string with one of: `base`, `expanded`, `multi`.\
+            \ Inside parlay records, fact_flow entries in the nested `flows` array\
+            \ are always `base`."
+      security:
+      - ApiKeyAuth: []
+      - BearerAuth: []
+      summary: Get flows (paginated)
+      tags:
+      - Trends
+      x-content-type: application/json
+      x-accepts:
+      - application/json
+  /v1/trends/flows-by-id:
+    post:
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/_v1_trends_flows_by_id_post_request"
+        required: true
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                type: object
+          description: "OK. Every record carries a `flow_type` string with one of:\
+            \ `fact_flow`, `fun_flow`, `fact_flow_parlay`, `fun_flow_parlay`, `plain_flow_parlay`.\
+            \ Parlay records also include the same field on each entry of their nested\
+            \ `flows` array. Records with `flow_type=fact_flow` additionally carry\
+            \ a `fact_flow_type` string with one of: `base`, `expanded`, `multi`.\
+            \ Inside parlay records, fact_flow entries in the nested `flows` array\
+            \ are always `base`."
+      security:
+      - ApiKeyAuth: []
+      - BearerAuth: []
+      summary: Get flows by ids
+      tags:
+      - Trends
+      x-content-type: application/json
+      x-accepts:
+      - application/json
+  /v1/trends/flows/quote:
+    post:
+      description: "Accepts a JSON array of 1..50 flow specifications and, for each\
+        \ one, forwards a hydrated payload to the URL the caller has registered under\
+        \ `/v1/account/check-endpoint`. Outbound calls run in parallel; the response\
+        \ is a JSON array with one entry per input item, in input order. Per-item\
+        \ failures are encoded in each entry's `status` (and `body`) so one bad operator\
+        \ response does not poison the others. Batch-level failures map to HTTP 4xx\
+        \ without an array body — 412 when the caller has not configured a check endpoint,\
+        \ 422 on validation failure."
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/trends_QuoteFlowRequest"
+        required: true
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/trends_QuoteFlowResponse"
+          description: Array of per-item results in input order.
+        "400":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/trends_ErrorResponse"
+          description: Malformed request body.
+        "412":
+          description: Caller has not configured a check endpoint.
+        "422":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/trends_ErrorResponse"
+          description: "Validation failed (empty batch, batch too large, or any item\
+            \ failed field validation)."
+      security:
+      - ApiKeyAuth: []
+      - BearerAuth: []
+      summary: Quote a batch of flows against the caller's configured check endpoint
+      tags:
+      - Trends
+      x-content-type: application/json
+      x-accepts:
+      - application/json
+  /v1/trends/flows/quote-sandbox:
+    post:
+      description: Drop-in stand-in for a real operator's pricing endpoint. Accepts
+        ONE hydrated pricing payload (the exact shape that /v1/trends/flows/quote
+        POSTs to a configured check endpoint) and returns synthetic pricing- response
+        data with deterministic `button_payload` values and randomly- injected failure
+        modes (~15% rate). Integrators wire this URL into /v1/account/check-endpoint
+        as `url` to round-trip the widget call entirely on platform infrastructure
+        without a real operator. Not for production traffic.
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/trends_QuoteSandboxRequest"
+        required: true
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/trends_QuoteSandboxResponse"
+          description: "Mock pricing response, shape depends on single vs parlay."
+        "400":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/trends_ErrorResponse"
+          description: Malformed request body.
+        "422":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/trends_ErrorResponse"
+          description: Validation failed.
+      summary: Mock operator pricing endpoint — for sandbox / development use
+      tags:
+      - Trends
+      x-content-type: application/json
+      x-accepts:
+      - application/json
+  /v1/trends/leagues-with-available-flows:
+    get:
+      parameters:
+      - explode: true
+        in: query
+        name: sport_id
+        required: false
+        schema:
+          format: int64
+          minimum: 1
+          type: integer
+        style: form
+      - description: "Sport external key (e.g. 'american-football'). Format: {sport_key}.\
+          \ Alternative to sport_id. If both are provided, sport_id takes precedence."
+        explode: true
+        in: query
+        name: sport_key
+        required: false
+        schema:
+          type: string
+        style: form
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                type: object
+          description: OK
+      security:
+      - ApiKeyAuth: []
+      - BearerAuth: []
+      summary: Get leagues with available flows
+      tags:
+      - Trends
+      x-accepts:
+      - application/json
+  /v1/trends/mixed-flows:
+    post:
+      requestBody:
+        content:
+          application/json:
+            example:
+              bet_type: singles
+              fact_flow_type: base
+              flow_type: fact
+              league_id: 7
+              page: 1
+              page_size: 20
+              sport_id: 1
+              starting_soon: true
+            schema:
+              $ref: "#/components/schemas/_v1_trends_flows_post_request"
+        required: true
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                type: object
+          description: "OK. Every record carries a `flow_type` string with one of:\
+            \ `fact_flow`, `fun_flow`, `fact_flow_parlay`, `fun_flow_parlay`, `plain_flow_parlay`.\
+            \ Parlay records also include the same field on each entry of their nested\
+            \ `flows` array. Records with `flow_type=fact_flow` additionally carry\
+            \ a `fact_flow_type` string with one of: `base`, `expanded`, `multi`.\
+            \ Inside parlay records, fact_flow entries in the nested `flows` array\
+            \ are always `base`."
+      security:
+      - ApiKeyAuth: []
+      - BearerAuth: []
+      summary: Get mixed flows (paginated)
+      tags:
+      - Trends
+      x-content-type: application/json
+      x-accepts:
+      - application/json
+  /v1/trends/widget/event:
+    post:
+      description: "Records a single client-side widget interaction (impression, click,\
+        \ dwell, or cart action) for analytics. Accepts a typed envelope `{event_type,\
+        \ mode, event_body}`: `event_type` is a closed enum naming the interaction,\
+        \ optional `mode` describes the widget mode, and `event_body` is an arbitrary\
+        \ JSON object whose shape depends on the event. Available only to widget API\
+        \ keys. Fire-and-forget: returns `202 Accepted` once the event is queued;\
+        \ the response does not guarantee durable storage."
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/trends_WidgetEventRequest"
+        required: true
+      responses:
+        "202":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/trends_WidgetEventResponse"
+          description: Event accepted for asynchronous processing.
+        "400":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/trends_ErrorResponse"
+          description: Malformed request body.
+        "403":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/trends_ErrorResponse"
+          description: The API key is not a widget key.
+        "422":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/trends_ErrorResponse"
+          description: "Validation failed (unknown event_type, invalid mode, missing\
+            \ event_body, or event_body is not a JSON object)."
+      security:
+      - ApiKeyAuth: []
+      summary: Submit a widget telemetry event
+      tags:
+      - Trends
+      x-content-type: application/json
+      x-accepts:
+      - application/json
+components:
+  parameters:
+    trends_CountryIdQueryParam:
+      explode: true
+      in: query
+      name: country_id
+      required: false
+      schema:
+        format: int64
+        type: integer
+      style: form
+    trends_EndDateQueryParam:
+      description: "Inclusive upper bound on the event/affiliation date, ISO format\
+        \ YYYY-MM-DD."
+      explode: true
+      in: query
+      name: end_date
+      required: false
+      schema:
+        type: string
+      style: form
+    trends_FlowTypeQueryParam:
+      description: Filter by flow type eligibility.
+      explode: true
+      in: query
+      name: flow_type
+      required: false
+      schema:
+        enum:
+        - fact_flows
+        - fun_flows
+        - plain_flows
+        - parlays
+        - singles
+        type: string
+      style: form
+    trends_LeagueIdQueryParam:
+      explode: true
+      in: query
+      name: league_id
+      required: false
+      schema:
+        format: int64
+        minimum: 1
+        type: integer
+      style: form
+    trends_LeagueKeyQueryParam:
+      description: "League external key (e.g. 'nba', 'united-states.nba'). Format:\
+        \ {league_key} or {country_key}.{league_key}. Alternative to league_id. If\
+        \ both are provided, league_id takes precedence."
+      explode: true
+      in: query
+      name: league_key
+      required: false
+      schema:
+        type: string
+      style: form
+    trends_PageParam:
+      explode: true
+      in: query
+      name: page
+      required: false
+      schema:
+        default: 1
+        format: int64
+        minimum: 1
+        type: integer
+      style: form
+    trends_PageSizeParam:
+      explode: true
+      in: query
+      name: page_size
+      required: false
+      schema:
+        default: 20
+        format: int64
+        maximum: 100
+        minimum: 1
+        type: integer
+      style: form
+    trends_SearchModeParam:
+      description: "Search mode (e.g. exact match vs partial). When omitted, uses\
+        \ default search behavior."
+      explode: true
+      in: query
+      name: search_mode
+      required: false
+      schema:
+        type: string
+      style: form
+    trends_SearchParam:
+      explode: true
+      in: query
+      name: search
+      required: false
+      schema:
+        type: string
+      style: form
+    trends_SportIdQueryParam:
+      explode: true
+      in: query
+      name: sport_id
+      required: false
+      schema:
+        format: int64
+        minimum: 1
+        type: integer
+      style: form
+    trends_SportKeyQueryParam:
+      description: "Sport external key (e.g. 'american-football'). Format: {sport_key}.\
+        \ Alternative to sport_id. If both are provided, sport_id takes precedence."
+      explode: true
+      in: query
+      name: sport_key
+      required: false
+      schema:
+        type: string
+      style: form
+    trends_StartDateQueryParam:
+      description: "Inclusive lower bound on the event/affiliation date, ISO format\
+        \ YYYY-MM-DD."
+      explode: true
+      in: query
+      name: start_date
+      required: false
+      schema:
+        type: string
+      style: form
+  responses:
+    affiliate_BadRequest:
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/affiliate_ErrorResponse"
+      description: The request was malformed.
+    affiliate_Forbidden:
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/affiliate_ErrorResponse"
+      description: Authenticated but not permitted to access this resource.
+    affiliate_InternalServerError:
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/affiliate_ErrorResponse"
+      description: Unexpected server error.
+    affiliate_NotFound:
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/affiliate_ErrorResponse"
+      description: The requested resource does not exist.
+    affiliate_UnprocessableEntity:
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/affiliate_ErrorResponse"
+      description: One or more fields failed validation; the message names each offending
+        field.
+    auth_BadRequest:
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/auth_ErrorResponse"
+      description: The request was malformed (invalid path/query parameter or JSON
+        type mismatch in the body).
+    auth_Conflict:
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/_v1_account_api_keys__key_code__delete_409_response"
+      description: "The request conflicts with the current resource state. Uses the\
+        \ account-envelope shape `{ \"success\": false, \"error\": \"...\" }` rather\
+        \ than the standard error envelope."
+    auth_Forbidden:
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/auth_ErrorResponse"
+      description: Authenticated but not permitted to access this resource.
+    auth_InternalServerError:
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/auth_ErrorResponse"
+      description: Unexpected server error.
+    auth_NotFound:
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/auth_ErrorResponse"
+      description: The requested resource does not exist.
+    auth_TooManyRequests:
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/auth_ErrorResponse"
+      description: Rate limit exceeded.
+    auth_Unauthorized:
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/auth_ErrorResponse"
+      description: Missing or invalid credentials.
+    auth_UnprocessableEntity:
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/auth_ErrorResponse"
+      description: The request body was syntactically valid JSON but one or more fields
+        failed validation; the message names each offending field.
+    trends_BadRequest:
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/trends_ErrorResponse"
+      description: The request was malformed (invalid path/query parameter or JSON
+        type mismatch in the body).
+    trends_Conflict:
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/trends_ErrorResponse"
+      description: The request conflicts with the current resource state.
+    trends_Forbidden:
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/trends_ErrorResponse"
+      description: Authenticated but not permitted to access this resource.
+    trends_InternalServerError:
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/trends_ErrorResponse"
+      description: Unexpected server error.
+    trends_NotFound:
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/trends_ErrorResponse"
+      description: The requested resource does not exist.
+    trends_TooManyRequests:
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/trends_ErrorResponse"
+      description: Rate limit exceeded.
+    trends_Unauthorized:
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/trends_ErrorResponse"
+      description: Missing or invalid credentials.
+    trends_UnprocessableEntity:
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/trends_ErrorResponse"
+      description: The request body was syntactically valid JSON but one or more fields
+        failed validation; the message names each offending field.
+  schemas:
+    affiliate_ErrorResponse:
+      example:
+        error:
+          code: BAD_REQUEST
+          message: message
+      properties:
+        error:
+          $ref: "#/components/schemas/affiliate_ErrorResponse_error"
+      required:
+      - error
+      type: object
+    auth_CheckEndpointResponse:
+      example:
+        data:
+          allow_multiple: true
+          auth_header_name: auth_header_name
+          auth_scheme: auth_scheme
+          auth_token_preview: auth_token_preview
+          created_at: 2000-01-23T04:56:07.000+00:00
+          method: POST
+          updated_at: 2000-01-23T04:56:07.000+00:00
+          url: https://openapi-generator.tech
+        success: true
+      properties:
+        data:
+          $ref: "#/components/schemas/auth_CheckEndpointResponse_data"
+        success:
+          type: boolean
+      type: object
+    auth_CreateAPIKeyRequest:
+      properties:
+        name:
+          type: string
+      required:
+      - name
+      type: object
+    auth_CreateAPIKeyResponse:
+      example:
+        api_key: api_key
+        key_code: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+        message: message
+        success: true
+      properties:
+        api_key:
+          description: Plaintext API key (returned only once)
+          type: string
+        key_code:
+          format: uuid
+          type: string
+        message:
+          type: string
+        success:
+          type: boolean
+      type: object
+    auth_CreateSecretResponse:
+      example:
+        client_secret: client_secret
+      properties:
+        client_secret:
+          description: "Plaintext secret (returned only once, prefixed with betflow_b2b_)"
+          type: string
+      type: object
+    auth_ErrorResponse:
+      example:
+        error:
+          code: BAD_REQUEST
+          message: message
+      properties:
+        error:
+          $ref: "#/components/schemas/affiliate_ErrorResponse_error"
+      required:
+      - error
+      type: object
+    auth_ListAPIKeysResponse:
+      example:
+        api_keys:
+        - active: true
+          created_at: 2000-01-23T04:56:07.000+00:00
+          expires_at: 2000-01-23T04:56:07.000+00:00
+          key_code: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+          name: name
+          widget: true
+        - active: true
+          created_at: 2000-01-23T04:56:07.000+00:00
+          expires_at: 2000-01-23T04:56:07.000+00:00
+          key_code: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+          name: name
+          widget: true
+        success: true
+      properties:
+        api_keys:
+          items:
+            $ref: "#/components/schemas/auth_ListAPIKeysResponse_api_keys_inner"
+          type: array
+        success:
+          type: boolean
+      type: object
+    auth_ListSecretsResponse:
+      example:
+        secrets:
+        - created_at: 2000-01-23T04:56:07.000+00:00
+          secret_code: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+          secret_preview: secret_preview
+          updated_at: 2000-01-23T04:56:07.000+00:00
+        - created_at: 2000-01-23T04:56:07.000+00:00
+          secret_code: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+          secret_preview: secret_preview
+          updated_at: 2000-01-23T04:56:07.000+00:00
+        success: true
+      properties:
+        secrets:
+          items:
+            $ref: "#/components/schemas/auth_ListSecretsResponse_secrets_inner"
+          type: array
+        success:
+          type: boolean
+      type: object
+    auth_OAuthLoginRequest:
+      properties:
+        client_id:
+          type: string
+        client_secret:
+          type: string
+      required:
+      - client_id
+      - client_secret
+      type: object
+    auth_RefreshRequest:
+      properties:
+        refresh_token:
+          type: string
+      required:
+      - refresh_token
+      type: object
+    auth_SetCheckEndpointRequest:
+      properties:
+        allow_multiple:
+          default: false
+          description: "If true, the platform sends a single POST with a JSON array\
+            \ of all hydrated payloads. If false (default), one POST per flow is issued\
+            \ in parallel."
+          type: boolean
+        auth_header_name:
+          description: "HTTP header name used to carry the authentication credential.\
+            \ Defaults to 'Authorization'. Common alternatives: 'X-API-Key', 'X-Auth'."
+          maxLength: 64
+          pattern: "^[A-Za-z0-9-]+$"
+          type: string
+        auth_scheme:
+          description: Prefix placed before the token in the header value. Defaults
+            to 'Bearer' when 'auth_header_name' is omitted. Set to an empty string
+            for headers that take the raw value (e.g. 'X-API-Key').
+          maxLength: 32
+          pattern: "^[A-Za-z0-9-]*$"
+          type: string
+        auth_token:
+          description: "Authentication credential. Stored server-side and never returned\
+            \ in any response. Sent as `<auth_header_name>: <auth_scheme> <auth_token>`\
+            \ (scheme omitted when empty)."
+          minLength: 8
+          type: string
+        method:
+          description: HTTP method used when calling the endpoint.
+          enum:
+          - POST
+          type: string
+        url:
+          description: Absolute URL of the check endpoint (https recommended).
+          format: uri
+          type: string
+      required:
+      - auth_token
+      - method
+      - url
+      type: object
+    auth_TokenPair:
+      example:
+        access_token: access_token
+        expires_at: 2000-01-23T04:56:07.000+00:00
+        expires_in: 0
+        refresh_token: refresh_token
+        token_type: token_type
+      properties:
+        access_token:
+          type: string
+        expires_at:
+          format: date-time
+          type: string
+        expires_in:
+          format: int64
+          type: integer
+        refresh_token:
+          type: string
+        token_type:
+          type: string
+      required:
+      - access_token
+      - expires_at
+      - expires_in
+      - refresh_token
+      - token_type
+      type: object
+    trends_ErrorResponse:
+      example:
+        error:
+          code: BAD_REQUEST
+          message: message
+      properties:
+        error:
+          $ref: "#/components/schemas/trends_ErrorResponse_error"
+      required:
+      - error
+      type: object
+    trends_PaginatedResponse:
+      example:
+        page: 0
+        page_size: 6
+        records:
+        - "{}"
+        - "{}"
+        total_count: 1
+        total_pages: 5
+      properties:
+        page:
+          format: int64
+          type: integer
+        page_size:
+          format: int64
+          type: integer
+        records:
+          items:
+            type: object
+          type: array
+        total_count:
+          format: int64
+          type: integer
+        total_pages:
+          format: int64
+          type: integer
+      type: object
+    trends_QuoteFlowItem:
+      properties:
+        country:
+          description: "ISO 3166-1 alpha-2 country code (e.g. 'US', 'IT'). Uppercased\
+            \ server-side."
+          maxLength: 2
+          minLength: 2
+          type: string
+        event_betting_market_position_ids:
+          description: "Leg identifiers that make up this flow. Length 1 = single,\
+            \ length 2+ = parlay."
+          items:
+            format: int64
+            minimum: 1
+            type: integer
+          minItems: 1
+          type: array
+        flow_id:
+          format: int64
+          minimum: 1
+          type: integer
+        flow_type:
+          enum:
+          - fact_flow
+          - fun_flow
+          - fact_flow_parlay
+          - fun_flow_parlay
+          - plain_flow_parlay
+          type: string
+        region:
+          description: "Sub-national region code (e.g. 'NJ', 'WA'). Uppercased server-side."
+          maxLength: 3
+          minLength: 2
+          type: string
+      required:
+      - country
+      - event_betting_market_position_ids
+      - flow_id
+      - flow_type
+      type: object
+    trends_QuoteFlowRequest:
+      description: Batch of 1..50 flow specifications to quote against the caller's
+        configured check endpoint.
+      items:
+        $ref: "#/components/schemas/trends_QuoteFlowItem"
+      maxItems: 50
+      minItems: 1
+      type: array
+    trends_QuoteFlowResponse:
+      description: "One result per input item, in input order. Match by index or by\
+        \ (flow_id, flow_type)."
+      items:
+        $ref: "#/components/schemas/trends_QuoteItemResult"
+      type: array
+    trends_QuoteItemResult:
+      example:
+        body: ""
+        flow_id: 0
+        flow_type: fact_flow
+        status: 6
+      properties:
+        body:
+          description: "Operator response passthrough on 200, error envelope otherwise."
+        flow_id:
+          format: int64
+          type: integer
+        flow_type:
+          enum:
+          - fact_flow
+          - fun_flow
+          - fact_flow_parlay
+          - fun_flow_parlay
+          - plain_flow_parlay
+          type: string
+        status:
+          description: "HTTP-style status code for this single item. 200 = success,\
+            \ 404 = flow not resolvable, 502 = upstream returned non-2xx or non-JSON,\
+            \ 504 = upstream timed out."
+          enum:
+          - 200
+          - 404
+          - 500
+          - 502
+          - 504
+          type: integer
+      required:
+      - body
+      - flow_id
+      - flow_type
+      - status
+      type: object
+    trends_QuoteSandboxRequest:
+      description: Single hydrated pricing payload — the exact shape /v1/trends/flows/quote
+        sends in each outbound call. Wire this endpoint into /v1/account/check-endpoint
+        to round-trip the widget call entirely on platform infrastructure (no real
+        operator needed).
+      properties:
+        country:
+          maxLength: 2
+          minLength: 2
+          type: string
+        event_betting_market_position_maps:
+          description: "Hydrated leg array, identical to what the quote endpoint POSTs\
+            \ to a real operator. Pass it through unchanged."
+          items:
+            type: object
+          type: array
+        flow_id:
+          format: int64
+          type: integer
+        flow_type:
+          enum:
+          - fact_flow
+          - fun_flow
+          - fact_flow_parlay
+          - fun_flow_parlay
+          - plain_flow_parlay
+          type: string
+        region:
+          maxLength: 3
+          minLength: 2
+          type: string
+      required:
+      - country
+      - event_betting_market_position_maps
+      - flow_id
+      - flow_type
+      type: object
+    trends_QuoteSandboxResponse:
+      description: Mock pricing response. Shape differs between single (1-leg) and
+        parlay (2+ legs); parlay responses additionally carry top-level combined odds
+        and is_combinable / parlay_failure_reason.
+      example:
+        american_odds_value: american_odds_value
+        button_payload: button_payload
+        decimal_odds_value: 0.8008281904610115
+        event_betting_market_position_maps:
+        - "{}"
+        - "{}"
+        flow_id: 6
+        flow_type: flow_type
+        fractional_odds_value: fractional_odds_value
+        is_combinable: true
+        odds_implied_probability: 1.4658129805029452
+        parlay_failure_reason: one or more legs failed
+        payout_multiplier: 5.962133916683182
+      properties:
+        american_odds_value:
+          description: Parlay only. Null when uncombinable.
+          nullable: true
+          type: string
+        button_payload:
+          description: Synthetic bet-slip identifier (prefix 'FD-MOCK-'). Null when
+            the result is invalid or the parlay is uncombinable.
+          nullable: true
+          type: string
+        decimal_odds_value:
+          nullable: true
+          type: number
+        event_betting_market_position_maps:
+          items:
+            description: Per-leg result with odds + is_valid + optional leg_failure_reason.
+            type: object
+          type: array
+        flow_id:
+          format: int64
+          type: integer
+        flow_type:
+          type: string
+        fractional_odds_value:
+          nullable: true
+          type: string
+        is_combinable:
+          description: Parlay only. False if any leg failed or the parlay-level uncombinable
+            roll fired.
+          type: boolean
+        odds_implied_probability:
+          nullable: true
+          type: number
+        parlay_failure_reason:
+          enum:
+          - one or more legs failed
+          - selections are not combinable
+          - null
+          nullable: true
+          type: string
+        payout_multiplier:
+          nullable: true
+          type: number
+      required:
+      - event_betting_market_position_maps
+      - flow_id
+      - flow_type
+      type: object
+    trends_WidgetEventRequest:
+      properties:
+        event_body:
+          additionalProperties: true
+          description: Arbitrary JSON object carrying event-specific fields. May be
+            an empty object.
+          type: object
+        event_type:
+          description: The kind of client-side widget interaction being reported.
+          enum:
+          - impression
+          - click
+          - dwell
+          - cart_open
+          - cart_offers_shown
+          - cart_dismiss
+          - card_click
+          - graph_expand
+          - graph_metric_change
+          - filter_change
+          - widget-impression
+          - widget-viewed
+          - betslip-clicked
+          - betslip-shared
+          - flow-clicked
+          - flow-shared
+          type: string
+        mode:
+          description: Optional widget mode the interaction occurred in. Defaults
+            to `clean`.
+          enum:
+          - operator
+          - affiliate
+          - clean
+          type: string
+      required:
+      - event_body
+      - event_type
+      type: object
+    trends_WidgetEventResponse:
+      example:
+        status: accepted
+      properties:
+        status:
+          enum:
+          - accepted
+          type: string
+      required:
+      - status
+      type: object
+    _v1_account_api_keys__key_code__delete_409_response:
+      example:
+        error: error
+        success: true
+      properties:
+        error:
+          description: Human-readable description of the constraint that blocked the
+            operation.
+          type: string
+        success:
+          type: boolean
+      required:
+      - error
+      - success
+      type: object
+    _v1_affiliates_deals_post_request:
+      properties:
+        country_code:
+          default: US
+          maxLength: 2
+          minLength: 2
+          type: string
+        excluded_operator_ids:
+          items:
+            format: int64
+            type: integer
+          type: array
+        hide_offers_links:
+          type: boolean
+        mode:
+          default: carousel
+          enum:
+          - carousel
+          - featured
+          - list
+          type: string
+        offer_campaign:
+          type: string
+        offer_type:
+          default: sports
+          type: string
+        operator_ids:
+          items:
+            format: int64
+            type: integer
+          type: array
+        operator_keys:
+          items:
+            type: string
+          type: array
+        operator_type_ids:
+          items:
+            format: int64
+            type: integer
+          type: array
+        page_number:
+          default: 1
+          minimum: 1
+          type: integer
+        page_size:
+          default: 20
+          maximum: 100
+          minimum: 1
+          type: integer
+        subnational_region_code:
+          maxLength: 10
+          type: string
+        with_reviews:
+          description: When true
+          type: boolean
+      type: object
+    _v1_affiliates_event_position_post_request:
+      properties:
+        country_code:
+          default: US
+          description: ISO 3166-1 alpha-2 country code.
+          maxLength: 2
+          minLength: 2
+          type: string
+        event_betting_market_position_id:
+          description: The event betting market position to build the cart for.
+          format: int64
+          minimum: 1
+          type: integer
+        hide_offers_links:
+          description: "When true, offer metadata is returned without the deep-link\
+            \ URLs."
+          type: boolean
+        odds_format:
+          description: "Odds display format. Defaults per product_mode (dfs→multiplier,\
+            \ prediction_market→percent, else american)."
+          enum:
+          - american
+          - decimal
+          - fractional
+          - multiplier
+          - percent
+          type: string
+        offer_campaign:
+          description: Optional campaign filter. Renders only offers tagged with this
+            campaign.
+          type: string
+        operator_ids:
+          description: Optional list of operator IDs to gate which operators appear
+            in the cart.
+          items:
+            format: int64
+            minimum: 1
+            type: integer
+          type: array
+        operator_keys:
+          description: Optional operator external keys (e.g. 'draftkings'). Resolved
+            IDs are merged with operator_ids.
+          items:
+            type: string
+          type: array
+        product_mode:
+          description: Display mode. dfs rewrites leg stat lines to MORE/LESS.
+          enum:
+          - sportsbook
+          - dfs
+          - prediction_market
+          type: string
+        subnational_region_code:
+          description: ISO 3166-2 subnational region code (used for offer/deeplink
+            resolution).
+          maxLength: 10
+          type: string
+        use_cartoon_images:
+          description: "When true, swaps default operator/jersey imagery for cartoon\
+            \ variants."
+          type: boolean
+      required:
+      - event_betting_market_position_id
+      type: object
+    _v1_affiliates_events_post_request:
+      properties:
+        country_code:
+          maxLength: 2
+          minLength: 2
+          type: string
+        device_type:
+          enum:
+          - ios
+          - android
+          - desktop
+          type: string
+        event_type:
+          enum:
+          - impression
+          - click
+          type: string
+        offer_campaign:
+          maxLength: 255
+          type: string
+        offer_id:
+          format: uuid
+          type: string
+        offer_label:
+          maxLength: 255
+          type: string
+        operator_id:
+          format: int64
+          minimum: 1
+          type: integer
+        session_token:
+          maxLength: 64
+          type: string
+        subnational_region_code:
+          maxLength: 10
+          type: string
+      required:
+      - country_code
+      - event_type
+      - offer_id
+      - operator_id
+      type: object
+    _v1_affiliates_links_post_request:
+      properties:
+        android_deep_link_url:
+          format: uri
+          type: string
+        country_code:
+          default: US
+          maxLength: 2
+          minLength: 2
+          type: string
+        ios_deep_link_url:
+          format: uri
+          type: string
+        is_active:
+          default: true
+          type: boolean
+        offer_call_to_action:
+          type: string
+        offer_campaign:
+          maxLength: 255
+          type: string
+        offer_category_id:
+          format: int64
+          type: integer
+        offer_display_bullets:
+          items:
+            type: string
+          type: array
+        offer_display_small_print:
+          maxLength: 255
+          type: string
+        offer_ev_usd:
+          type: number
+        offer_label:
+          maxLength: 255
+          type: string
+        offer_priority:
+          type: integer
+        offer_tagline:
+          maxLength: 255
+          type: string
+        operator_id:
+          description: One of operator_id or operator_name is required.
+          format: int64
+          type: integer
+        operator_name:
+          type: string
+        source_network_affiliate_partner_id:
+          format: int64
+          type: integer
+        subnational_region_code:
+          description: Omit for country-grain inventory.
+          maxLength: 10
+          type: string
+        web_deep_link_url:
+          format: uri
+          type: string
+      required:
+      - offer_category_id
+      - web_deep_link_url
+      type: object
+    _v1_affiliates_links_bulk_post_202_response:
+      example:
+        job_id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+        mode: async
+        poll_url: poll_url
+        status: queued
+        submitted_rows: 0
+      properties:
+        job_id:
+          format: uuid
+          type: string
+        mode:
+          example: async
+          type: string
+        poll_url:
+          type: string
+        status:
+          example: queued
+          type: string
+        submitted_rows:
+          type: integer
+      type: object
+    _v1_affiliates_links_bulk_patch_request:
+      properties:
+        filter:
+          type: object
+        patch:
+          type: object
+      required:
+      - filter
+      - patch
+      type: object
+    _v1_affiliates_links_bulk_deactivate_post_request:
+      properties:
+        filter:
+          type: object
+      required:
+      - filter
+      type: object
+    _v1_affiliates_offers_post_request:
+      properties:
+        country_code:
+          default: US
+          maxLength: 2
+          minLength: 2
+          type: string
+        excluded_operator_ids:
+          items:
+            format: int64
+            type: integer
+          type: array
+        hide_offers_links:
+          type: boolean
+        offer_campaign:
+          type: string
+        operator_ids:
+          items:
+            format: int64
+            type: integer
+          type: array
+        operator_keys:
+          items:
+            type: string
+          type: array
+        operator_type_ids:
+          items:
+            format: int64
+            type: integer
+          type: array
+        subnational_region_code:
+          maxLength: 10
+          type: string
+      type: object
+    _v1_affiliates_parlay_post_request:
+      properties:
+        country_code:
+          default: US
+          description: ISO 3166-1 alpha-2 country code.
+          maxLength: 2
+          minLength: 2
+          type: string
+        event_betting_market_position_ids:
+          description: The event betting market positions that make up the parlay
+            legs.
+          items:
+            format: int64
+            minimum: 1
+            type: integer
+          minItems: 1
+          type: array
+        hide_offers_links:
+          description: "When true, offer metadata is returned without the deep-link\
+            \ URLs."
+          type: boolean
+        odds_format:
+          description: "Odds display format. Defaults per product_mode (dfs→multiplier,\
+            \ prediction_market→percent, else american)."
+          enum:
+          - american
+          - decimal
+          - fractional
+          - multiplier
+          - percent
+          type: string
+        offer_campaign:
+          description: Optional campaign filter. Renders only offers tagged with this
+            campaign.
+          type: string
+        operator_ids:
+          description: Optional list of operator IDs to gate which operators appear
+            in the cart.
+          items:
+            format: int64
+            minimum: 1
+            type: integer
+          type: array
+        operator_keys:
+          description: Optional operator external keys (e.g. 'draftkings'). Resolved
+            IDs are merged with operator_ids.
+          items:
+            type: string
+          type: array
+        product_mode:
+          description: Display mode. dfs rewrites leg stat lines to MORE/LESS.
+          enum:
+          - sportsbook
+          - dfs
+          - prediction_market
+          type: string
+        subnational_region_code:
+          description: ISO 3166-2 subnational region code (used for offer/deeplink
+            resolution).
+          maxLength: 10
+          type: string
+      required:
+      - event_betting_market_position_ids
+      type: object
+    _v1_events_upcoming_events_post_request:
+      properties:
+        event_date:
+          description: Filter by event date (YYYY-MM-DD). Defaults to today (UTC).
+          format: date
+          type: string
+        league_id:
+          format: int64
+          minimum: 1
+          type: integer
+        league_key:
+          description: "League external key (e.g. 'nba', 'united-states.nba'). Alternative\
+            \ to league_id. If both are provided, league_id takes precedence."
+          type: string
+        page:
+          default: 1
+          description: Page number for pagination
+          format: int64
+          minimum: 1
+          type: integer
+        page_size:
+          default: 100
+          description: Number of events per page
+          format: int64
+          maximum: 100
+          minimum: 1
+          type: integer
+        sport_id:
+          format: int64
+          minimum: 1
+          type: integer
+        sport_key:
+          description: "Sport external key (e.g. 'american-football'). Alternative\
+            \ to sport_id. If both are provided, sport_id takes precedence."
+          type: string
+        timezone:
+          default: UTC
+          description: "IANA timezone for date interpretation (e.g. 'UTC', 'America/New_York',\
+            \ 'Europe/London')"
+          type: string
+      type: object
+    _v1_odds_upcoming_odds_by_event_post_request:
+      properties:
+        event_id:
+          description: The event ID to retrieve odds for
+          format: int64
+          minimum: 1
+          type: integer
+        operator_ids:
+          description: Optional list of operator IDs to filter by
+          items:
+            format: int32
+            minimum: 1
+            type: integer
+          type: array
+        page:
+          default: 1
+          description: Page number for pagination
+          format: int64
+          minimum: 1
+          type: integer
+        page_size:
+          default: 100
+          description: Number of results per page
+          format: int64
+          maximum: 100
+          minimum: 1
+          type: integer
+      required:
+      - event_id
+      type: object
+    _v1_references_tag_dimensions_get_200_response:
+      example:
+        records:
+        - "{}"
+        - "{}"
+      properties:
+        records:
+          items:
+            type: object
+          type: array
+      type: object
+    _v1_references_tag_types__tag_type_id__children_get_200_response:
+      example:
+        parent: "{}"
+        records:
+        - "{}"
+        - "{}"
+      properties:
+        parent:
+          type: object
+        records:
+          items:
+            type: object
+          type: array
+      type: object
+    _v1_trends_by_betting_market_position_post_request:
+      properties:
+        event_betting_market_position_ids:
+          description: Array of event betting market position IDs
+          items:
+            format: int64
+            minimum: 1
+            type: integer
+          minItems: 1
+          type: array
+        odds_format:
+          description: "Odds display format. Defaults per product_mode (dfs→multiplier,\
+            \ prediction_market→percent, else american)."
+          enum:
+          - american
+          - decimal
+          - fractional
+          - multiplier
+          - percent
+          type: string
+        product_mode:
+          description: "Display mode. dfs rewrites stat lines to MORE/LESS; on the\
+            \ paginated flows endpoints it also auto-filters to over/under player\
+            \ props (entity_type=player, positions [4,5]) unless an entity/position\
+            \ filter is set."
+          enum:
+          - sportsbook
+          - dfs
+          - prediction_market
+          type: string
+        use_cartoon_images:
+          description: "When true, the logo fields on each flow, leg, and multi-trend\
+            \ slot (default_logo_url, logo_url_1, logo_url_2) are replaced with cartoon-jersey\
+            \ image URLs derived from the relevant team, player, or league. When false\
+            \ or omitted, the original logo URLs are returned. Defaults to false."
+          type: boolean
+      required:
+      - event_betting_market_position_ids
+      type: object
+    _v1_trends_flows_post_request:
+      properties:
+        bet_type:
+          description: "Filter by bet type. If omitted, returns mixed singles and\
+            \ parlays."
+          enum:
+          - singles
+          - parlay
+          - same_game_parlay
+          type: string
+        betting_market_category_id:
+          deprecated: true
+          description: "Deprecated — use `betting_market_category_ids` instead (e.g.\
+            \ Shooting Props, Game Props etc.). A bare `betting_market_category_id`\
+            \ is treated as `betting_market_category_ids: [betting_market_category_id]`."
+          format: int64
+          minimum: 1
+          type: integer
+        betting_market_category_ids:
+          description: "Filter by one or more betting market category IDs (e.g. Shooting\
+            \ Props, Game Props etc.). Empty array = no filter."
+          items:
+            format: int64
+            minimum: 1
+            type: integer
+          type: array
+        betting_market_entity_type:
+          description: Filter by betting market entity type
+          enum:
+          - player
+          - team
+          - event
+          type: string
+        betting_market_ids:
+          description: Filter by betting market IDs
+          items:
+            format: int64
+            minimum: 1
+            type: integer
+          type: array
+        betting_market_position_id:
+          deprecated: true
+          description: "Deprecated — use `betting_market_position_ids` instead. A\
+            \ bare `betting_market_position_id` is treated as `betting_market_position_ids:\
+            \ [betting_market_position_id]`."
+          format: int64
+          minimum: 1
+          type: integer
+        betting_market_position_ids:
+          description: Filter by one or more betting market position IDs. Empty array
+            = no filter.
+          items:
+            format: int64
+            minimum: 1
+            type: integer
+          type: array
+        event_id:
+          deprecated: true
+          description: "Deprecated — use `event_ids` instead. A bare `event_id` is\
+            \ treated as `event_ids: [event_id]`."
+          format: int64
+          minimum: 1
+          type: integer
+        event_ids:
+          description: Filter by one or more event IDs. Empty array = no filter.
+          items:
+            format: int64
+            minimum: 1
+            type: integer
+          type: array
+        event_start_date_from:
+          description: Filter events starting on or after this value. Accepts a date
+            ('2026-04-19') or full ISO 8601 timestamp ('2026-04-19T00:00:00Z').
+          format: date-time
+          type: string
+        event_start_date_to:
+          description: Filter events starting on or before this value. Accepts a date
+            ('2026-04-26') or full ISO 8601 timestamp ('2026-04-26T23:59:59Z').
+          format: date-time
+          type: string
+        fact_flow_type:
+          description: Sub-type for fact flows. Defaults to 'base' if omitted.
+          enum:
+          - base
+          - expanded
+          - multi
+          type: string
+        flow_type:
+          description: Type of flow to return. 'plain' only returns parlays.
+          enum:
+          - fact
+          - fun
+          - plain
+          type: string
+        focus_entity_type_id:
+          description: Filter by focus entity type ID
+          format: int64
+          minimum: 1
+          type: integer
+        full_hit_rate:
+          description: "When true, include full hit rate data in response"
+          type: boolean
+        include_alt_lines:
+          description: "When false, exclude alt lines. Defaults to true."
+          type: boolean
+        include_deeplinks:
+          description: "When true, returns operator-specific odds and deeplink URLs\
+            \ (bet_ios_deep_link_url, bet_android_deep_link_url, bet_web_deep_link_url)\
+            \ for each flow. Requires exactly one operator_id in operator_ids."
+          type: boolean
+        include_only_basic_trends:
+          description: "When true, return only basic trends (omit fact flows with\
+            \ conditions)"
+          type: boolean
+        include_star_sign_content:
+          description: "When true, include star sign/horoscope content in flows"
+          type: boolean
+        league_id:
+          deprecated: true
+          description: "Deprecated — use `league_ids` instead. A bare `league_id`\
+            \ is treated as `league_ids: [league_id]`."
+          format: int64
+          minimum: 1
+          type: integer
+        league_ids:
+          description: Filter by one or more league IDs. Empty array = no filter.
+          items:
+            format: int64
+            minimum: 1
+            type: integer
+          type: array
+        league_key:
+          description: "League external key (e.g. 'nba', 'united-states.nba'). Format:\
+            \ {league_key} or {country_key}.{league_key}. Alternative to league_id.\
+            \ If both are provided, league_id takes precedence."
+          type: string
+        likelihood_type:
+          description: Filter by likelihood category
+          enum:
+          - likely
+          - possible
+          - longshot
+          type: string
+        max_hit_rate_threshold:
+          description: Maximum hit rate threshold filter (0-100)
+          maximum: 100
+          minimum: 0
+          type: integer
+        max_implied_probability_threshold:
+          description: Maximum implied probability threshold filter
+          format: double
+          type: number
+        min_hit_rate_threshold:
+          description: Minimum hit rate threshold filter (0-100)
+          maximum: 100
+          minimum: 0
+          type: integer
+        min_implied_probability_threshold:
+          description: Minimum implied probability threshold filter
+          format: double
+          type: number
+        odds_format:
+          description: "Odds display format. Defaults per product_mode (dfs→multiplier,\
+            \ prediction_market→percent, else american)."
+          enum:
+          - american
+          - decimal
+          - fractional
+          - multiplier
+          - percent
+          type: string
+        operator_ids:
+          description: Filter by operator IDs
+          items:
+            format: int64
+            minimum: 1
+            type: integer
+          type: array
+        operator_keys:
+          description: "Filter by operator external keys (e.g. 'draftkings'). Format:\
+            \ {operator_key}. Resolved IDs are merged with operator_ids."
+          items:
+            type: string
+          type: array
+        page:
+          format: int64
+          minimum: 1
+          type: integer
+        page_size:
+          format: int64
+          maximum: 25
+          minimum: 1
+          type: integer
+        player_id:
+          deprecated: true
+          description: "Deprecated — use `player_ids` instead. A bare `player_id`\
+            \ is treated as `player_ids: [player_id]`."
+          format: int64
+          minimum: 1
+          type: integer
+        player_ids:
+          description: Filter by one or more player IDs. Empty array = no filter.
+          items:
+            format: int64
+            minimum: 1
+            type: integer
+          type: array
+        player_key:
+          description: "Player external key (e.g. 'nikola-vucevic', 'chicago-bulls.tre-jones',\
+            \ 'nba.boston-celtics.nikola-vucevic'). Format: {player_key} or {team_key}.{player_key}\
+            \ or {league_key}.{team_key}.{player_key}. Alternative to player_id. If\
+            \ both are provided, player_id takes precedence."
+          type: string
+        product_mode:
+          description: "Display mode. dfs rewrites stat lines to MORE/LESS; on the\
+            \ paginated flows endpoints it also auto-filters to over/under player\
+            \ props (entity_type=player, positions [4,5]) unless an entity/position\
+            \ filter is set."
+          enum:
+          - sportsbook
+          - dfs
+          - prediction_market
+          type: string
+        split_type:
+          description: Filter by split type (overs or unders)
+          enum:
+          - overs
+          - unders
+          type: string
+        sport_id:
+          deprecated: true
+          description: "Deprecated — use `sport_ids` instead. A bare `sport_id` is\
+            \ treated as `sport_ids: [sport_id]`."
+          format: int64
+          minimum: 1
+          type: integer
+        sport_ids:
+          description: Filter by one or more sport IDs. Empty array = no filter.
+          items:
+            format: int64
+            minimum: 1
+            type: integer
+          type: array
+        sport_key:
+          description: "Sport external key (e.g. 'american-football'). Format: {sport_key}.\
+            \ Alternative to sport_id. If both are provided, sport_id takes precedence."
+          type: string
+        starting_soon:
+          description: "When true, only return flows for events starting soon"
+          type: boolean
+        team_id:
+          deprecated: true
+          description: "Deprecated — use `team_ids` instead. A bare `team_id` is treated\
+            \ as `team_ids: [team_id]`."
+          format: int64
+          minimum: 1
+          type: integer
+        team_ids:
+          description: Filter by one or more team IDs. Empty array = no filter.
+          items:
+            format: int64
+            minimum: 1
+            type: integer
+          type: array
+        team_key:
+          description: "Team external key (e.g. 'new-england-patriots', 'nfl.new-england-patriots').\
+            \ Format: {team_key} or {league_key}.{team_key}. Alternative to team_id.\
+            \ If both are provided, team_id takes precedence."
+          type: string
+        team_split:
+          description: Team split filter value
+          type: string
+        use_cartoon_images:
+          description: "When true, the logo fields on each flow, leg, and multi-trend\
+            \ slot (default_logo_url, logo_url_1, logo_url_2) are replaced with cartoon-jersey\
+            \ image URLs derived from the relevant team, player, or league. When false\
+            \ or omitted, the original logo URLs are returned. Defaults to false."
+          type: boolean
+      type: object
+    _v1_trends_flows_by_id_post_request:
+      properties:
+        fact_flow_type:
+          description: Sub-type for fact flows. Defaults to 'base' if omitted.
+          enum:
+          - base
+          - expanded
+          type: string
+        flow_ids:
+          description: Array of flow IDs to retrieve
+          items:
+            format: int64
+            minimum: 1
+            type: integer
+          minItems: 1
+          type: array
+        flow_type:
+          enum:
+          - fact_flow
+          - fun_flow
+          - fact_flow_parlay
+          - fun_flow_parlay
+          - plain_flow_parlay
+          type: string
+        use_cartoon_images:
+          description: "When true, the logo fields on each flow, leg, and multi-trend\
+            \ slot (default_logo_url, logo_url_1, logo_url_2) are replaced with cartoon-jersey\
+            \ image URLs derived from the relevant team, player, or league. When false\
+            \ or omitted, the original logo URLs are returned. Defaults to false."
+          type: boolean
+      required:
+      - flow_ids
+      - flow_type
+      type: object
+    affiliate_ErrorResponse_error:
+      example:
+        code: BAD_REQUEST
+        message: message
+      properties:
+        code:
+          enum:
+          - BAD_REQUEST
+          - VALIDATION_ERROR
+          - UNAUTHORIZED
+          - FORBIDDEN
+          - NOT_FOUND
+          - RATE_LIMIT_EXCEEDED
+          - INTERNAL_ERROR
+          type: string
+        message:
+          type: string
+      required:
+      - code
+      - message
+      type: object
+    auth_CheckEndpointResponse_data:
+      example:
+        allow_multiple: true
+        auth_header_name: auth_header_name
+        auth_scheme: auth_scheme
+        auth_token_preview: auth_token_preview
+        created_at: 2000-01-23T04:56:07.000+00:00
+        method: POST
+        updated_at: 2000-01-23T04:56:07.000+00:00
+        url: https://openapi-generator.tech
+      nullable: true
+      properties:
+        allow_multiple:
+          type: boolean
+        auth_header_name:
+          type: string
+        auth_scheme:
+          description: May be empty for raw-value header schemes like 'X-API-Key'.
+          type: string
+        auth_token_preview:
+          description: Masked preview of the stored auth token (e.g. "…aB3x"). The
+            full token is never returned.
+          type: string
+        created_at:
+          format: date-time
+          type: string
+        method:
+          enum:
+          - POST
+          type: string
+        updated_at:
+          format: date-time
+          type: string
+        url:
+          format: uri
+          type: string
+      type: object
+    auth_ListAPIKeysResponse_api_keys_inner:
+      example:
+        active: true
+        created_at: 2000-01-23T04:56:07.000+00:00
+        expires_at: 2000-01-23T04:56:07.000+00:00
+        key_code: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+        name: name
+        widget: true
+      properties:
+        active:
+          type: boolean
+        created_at:
+          format: date-time
+          type: string
+        expires_at:
+          format: date-time
+          nullable: true
+          type: string
+        key_code:
+          format: uuid
+          type: string
+        name:
+          type: string
+        widget:
+          type: boolean
+      type: object
+    auth_ListSecretsResponse_secrets_inner:
+      example:
+        created_at: 2000-01-23T04:56:07.000+00:00
+        secret_code: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+        secret_preview: secret_preview
+        updated_at: 2000-01-23T04:56:07.000+00:00
+      properties:
+        created_at:
+          format: date-time
+          type: string
+        secret_code:
+          format: uuid
+          type: string
+        secret_preview:
+          description: Masked secret preview (e.g. betflow_b2b_...5678901234)
+          type: string
+        updated_at:
+          format: date-time
+          type: string
+      type: object
+    trends_ErrorResponse_error:
+      example:
+        code: BAD_REQUEST
+        message: message
+      properties:
+        code:
+          description: |
+            Machine-readable error code. Possible values:
+              * `BAD_REQUEST` — malformed request, invalid path/query parameter, or JSON type mismatch in the body. Returned with HTTP 400.
+              * `VALIDATION_ERROR` — one or more request fields failed validation rules; the message names each offending field. Returned with HTTP 422 (Unprocessable Entity).
+              * `AMBIGUOUS_LOOKUP` — a slug identifier matched more than one record; qualify it (e.g. `country/league`) and retry.
+              * `UNAUTHORIZED` — missing or invalid credentials.
+              * `FORBIDDEN` — authenticated but not permitted to access this resource.
+              * `NOT_FOUND` — resource does not exist.
+              * `RATE_LIMIT_EXCEEDED` — too many requests.
+              * `INTERNAL_ERROR` — unexpected server error.
+          enum:
+          - BAD_REQUEST
+          - VALIDATION_ERROR
+          - AMBIGUOUS_LOOKUP
+          - UNAUTHORIZED
+          - FORBIDDEN
+          - NOT_FOUND
+          - RATE_LIMIT_EXCEEDED
+          - INTERNAL_ERROR
+          type: string
+        message:
+          description: "Human-readable explanation of the error. For `VALIDATION_ERROR`\
+            \ responses, names the offending field(s) and the rule that failed."
+          type: string
+      required:
+      - code
+      - message
+      type: object
+  securitySchemes:
+    ApiKeyAuth:
+      in: header
+      name: X-API-Key
+      type: apiKey
+    BearerAuth:
+      bearerFormat: JWT
+      scheme: bearer
+      type: http
+
