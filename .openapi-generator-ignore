@@ -21,3 +21,7 @@
 #docs/*.md
 # Then explicitly reverse the ignore rule for a single file:
 #!docs/README.md
+
+# Hand-written convenience auth layer (see AuthSession.java). Preserve on regen.
+src/main/java/com/odditt/apiclient/AuthSession.java
+src/test/java/com/odditt/apiclient/AuthSessionTest.java

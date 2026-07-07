@@ -77,26 +77,30 @@ Then manually install the following JARs:
 
 Please follow the [installation](#installation) instruction and execute the following Java code:
 
+You authenticate with **either** an API key **or** OAuth client credentials — you
+do not supply a Bearer token yourself. `AuthSession` exchanges your credential for
+a short-lived Bearer JWT (via `POST /v1/auth/login` or `POST /v1/oauth/login`) and
+transparently refreshes it before it expires. Data endpoints also accept the API
+key directly via the `X-API-Key` header, so no login round-trip is needed for them.
+
 ```java
 
 // Import classes:
-import com.odditt.apiclient.ApiClient;
 import com.odditt.apiclient.ApiException;
-import com.odditt.apiclient.Configuration;
-import com.odditt.apiclient.auth.*;
+import com.odditt.apiclient.AuthSession;
 import com.odditt.apiclient.model.*;
 import com.odditt.apiclient.api.AccountApi;
 
 public class Example {
   public static void main(String[] args) {
-    ApiClient defaultClient = Configuration.getDefaultApiClient();
-    defaultClient.setBasePath("https://api.odditt.com");
-    
-    // Configure HTTP bearer authorization: BearerAuth
-    HttpBearerAuth BearerAuth = (HttpBearerAuth) defaultClient.getAuthentication("BearerAuth");
-    BearerAuth.setBearerToken("BEARER TOKEN");
+    // Option A — API key (X-API-Key on data endpoints; auto-login + refresh
+    // Bearer for account endpoints):
+    AuthSession session = AuthSession.fromApiKey("YOUR_API_KEY");
 
-    AccountApi apiInstance = new AccountApi(defaultClient);
+    // Option B — OAuth client credentials (auto-refreshed Bearer everywhere):
+    // AuthSession session = AuthSession.fromClientCredentials("CLIENT_ID", "CLIENT_SECRET");
+
+    AccountApi apiInstance = new AccountApi(session.getApiClient());
     try {
       AuthListAPIKeysResponse result = apiInstance.v1AccountApiKeysGet();
       System.out.println(result);
