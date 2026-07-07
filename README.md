@@ -83,37 +83,38 @@ a short-lived Bearer JWT (via `POST /v1/auth/login` or `POST /v1/oauth/login`) a
 transparently refreshes it before it expires. Data endpoints also accept the API
 key directly via the `X-API-Key` header, so no login round-trip is needed for them.
 
-```java
+Authenticate with an **API key** (X-API-Key on data endpoints; auto-login +
+refresh Bearer for account endpoints):
 
-// Import classes:
-import com.odditt.apiclient.ApiException;
+```java
 import com.odditt.apiclient.AuthSession;
-import com.odditt.apiclient.model.*;
 import com.odditt.apiclient.api.AccountApi;
 
 public class Example {
-  public static void main(String[] args) {
-    // Option A — API key (X-API-Key on data endpoints; auto-login + refresh
-    // Bearer for account endpoints):
+  public static void main(String[] args) throws Exception {
     AuthSession session = AuthSession.fromApiKey("YOUR_API_KEY");
 
-    // Option B — OAuth client credentials (auto-refreshed Bearer everywhere):
-    // AuthSession session = AuthSession.fromClientCredentials("CLIENT_ID", "CLIENT_SECRET");
-
     AccountApi apiInstance = new AccountApi(session.getApiClient());
-    try {
-      AuthListAPIKeysResponse result = apiInstance.v1AccountApiKeysGet();
-      System.out.println(result);
-    } catch (ApiException e) {
-      System.err.println("Exception when calling AccountApi#v1AccountApiKeysGet");
-      System.err.println("Status code: " + e.getCode());
-      System.err.println("Reason: " + e.getResponseBody());
-      System.err.println("Response headers: " + e.getResponseHeaders());
-      e.printStackTrace();
-    }
+    System.out.println(apiInstance.v1AccountApiKeysGet());
   }
 }
+```
 
+Or authenticate with **OAuth client credentials** (auto-refreshed Bearer
+everywhere):
+
+```java
+import com.odditt.apiclient.AuthSession;
+import com.odditt.apiclient.api.AccountApi;
+
+public class Example {
+  public static void main(String[] args) throws Exception {
+    AuthSession session = AuthSession.fromClientCredentials("CLIENT_ID", "CLIENT_SECRET");
+
+    AccountApi apiInstance = new AccountApi(session.getApiClient());
+    System.out.println(apiInstance.v1AccountApiKeysGet());
+  }
+}
 ```
 
 ## Documentation for API Endpoints
