@@ -32,6 +32,41 @@ mvn clean deploy
 
 Refer to the [OSSRH Guide](http://central.sonatype.org/pages/ossrh-guide.html) for more information.
 
+### Install from GitHub (JitPack)
+
+[JitPack](https://jitpack.io) builds the library straight from the GitHub repository — no Maven publication needed.
+
+Maven — add the JitPack repository and the dependency to your POM:
+
+```xml
+<repositories>
+  <repository>
+    <id>jitpack.io</id>
+    <url>https://jitpack.io</url>
+  </repository>
+</repositories>
+
+<dependency>
+  <groupId>com.github.Odditt-Betflow</groupId>
+  <artifactId>odditt-api-client-java</artifactId>
+  <version>main-SNAPSHOT</version>
+</dependency>
+```
+
+Gradle:
+
+```groovy
+repositories {
+  maven { url 'https://jitpack.io' }
+}
+
+dependencies {
+  implementation 'com.github.Odditt-Betflow:odditt-api-client-java:main-SNAPSHOT'
+}
+```
+
+Replace `main-SNAPSHOT` with a tag (e.g. `v0.1.0`) once tags are available.
+
 ### Maven users
 
 Add this dependency to your project's POM:
